@@ -40,11 +40,11 @@ if ($ShortOrLong -eq 1) {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
         $AliveTest | Out-File -FilePath $using:OutLocation\$_.txt
         if ($AliveTest.Status -notcontains "Success") {
-            Write-Warning "Dead host at $_ or high latency. Skipping."
-            Write-Output "Dead host at $_ or high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            Write-Warning "$_ is not responding or has high latency. Skipping."
+            Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            Test-Connection -Count 50 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            Test-Connection -Count 5 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
     }
 }
@@ -56,8 +56,8 @@ if ($ShortOrLong -eq 2) {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
         $AliveTest | Out-File -FilePath $using:OutLocation\$_.txt
         if ($AliveTest.status -notcontains "Success") {
-            Write-Warning "Dead host at $_ or high latency. Skipping."
-            Write-Output "Dead host at $_ or high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            Write-Warning "$_ is not responding or has high latency. Skipping."
+            Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
             Test-Connection -Count 250 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
@@ -75,9 +75,9 @@ Write-Host ""
 foreach ($File in $Files) {
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
-    if ($Content -match 'TimedOut') {
-        if ($Content -match 'Dead') {
-            Write-Warning "Dead host at $Filename or high latency."
+    if ("$Content" -match 'TimedOut') {
+        if ("$Content" -match 'Dead') {
+            Write-Warning "$_ is not responding or has high latency."
         }
         else {
             Write-Host "Dropped packets at $Filename."
@@ -90,9 +90,9 @@ Write-Host ""
 foreach ($File in $Files) { 
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
-    if ($Content -match 'TimedOut') {
-        if ($Content -match 'Dead') {
-            Write-Output "$Filename did not respond." | Out-file -Path $Results -Force -Append
+    if ("$Content" -match 'TimedOut') {
+        if ("$Content" -match 'Dead') {
+            Write-Output "$_ is not responding or has high latency." | Out-file -Path $Results -Force -Append
         }
         else {
             Write-Output "$Filename dropped packets." | Out-file -Path $Results -Force -Append

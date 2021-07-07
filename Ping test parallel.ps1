@@ -44,7 +44,7 @@ if ($ShortOrLong -eq 1) {
             Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            Test-Connection -Count 5 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            Test-Connection -Count 50 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
     }
 }

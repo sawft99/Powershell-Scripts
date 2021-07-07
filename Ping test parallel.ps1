@@ -102,5 +102,5 @@ foreach ($File in $Files) {
         Write-Output "$Filename is ok. Check for latency." | Out-File -Path $Results -Force -Append
     }
 }
-Write-Host "All results recorded to $Outocation\Results.txt."
+Write-Host "All results recorded to $OutLocation\Results.txt."
 Write-Host ""

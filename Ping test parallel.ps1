@@ -76,11 +76,11 @@ foreach ($File in $Files) {
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
     if ("$Content" -match 'TimedOut') {
-        if ("$Content" -match 'Dead') {
+        if ("$Content" -match 'is not responding or has high latency') {
             Write-Warning "$_ is not responding or has high latency."
         }
         else {
-            Write-Host "Dropped packets at $Filename."
+            Write-Host "$Filename dropped packets."
         }
     }
 }
@@ -91,7 +91,7 @@ foreach ($File in $Files) {
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
     if ("$Content" -match 'TimedOut') {
-        if ("$Content" -match 'Dead') {
+        if ("$Content" -match 'is not responding or has high latency') {
             Write-Output "$_ is not responding or has high latency." | Out-file -Path $Results -Force -Append
         }
         else {

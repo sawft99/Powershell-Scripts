@@ -77,7 +77,7 @@ foreach ($File in $Files) {
     $Filename = $File.BaseName
     if ("$Content" -match 'TimedOut') {
         if ("$Content" -match 'is not responding or has high latency') {
-            Write-Warning "$_ is not responding or has high latency."
+            Write-Warning "$Filename is not responding or has high latency."
         }
         else {
             Write-Host "$Filename dropped packets."

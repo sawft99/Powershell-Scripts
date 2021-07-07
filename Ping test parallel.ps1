@@ -92,7 +92,7 @@ foreach ($File in $Files) {
     $Filename = $File.BaseName
     if ("$Content" -match 'TimedOut') {
         if ("$Content" -match 'is not responding or has high latency') {
-            Write-Output "$_ is not responding or has high latency." | Out-file -Path $Results -Force -Append
+            Write-Output "$Filename is not responding or has high latency." | Out-file -Path $Results -Force -Append
         }
         else {
             Write-Output "$Filename dropped packets." | Out-file -Path $Results -Force -Append

@@ -26,7 +26,7 @@ Options:
 do {
     $ShortOrLong = Read-Host -Prompt "Select an option"
     if ($ShortOrLong -notin 1..2) {
-        Write-Warning "Please pick a valid option"
+        Write-Warning "Please pick a valid option."
     }
 }
 while ($ShortOrLong -notin 1..2)
@@ -35,26 +35,32 @@ Write-Host ""
 #Parallel ping. Results recorded to each appropriate file
 if ($ShortOrLong -eq 1) {
     Write-Host "Running short ping test..."
+    Write-Host ""
     $Custom2 | ForEach-Object -ThrottleLimit 20 -Verbose -Parallel {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
-        if ($AliveTest.status -notcontains "Success") {
-            Write-Warning "Dead host at $_ or high latency. Skipping"
+        $AliveTest | Out-File -FilePath $using:OutLocation\$_.txt
+        if ($AliveTest.Status -notcontains "Success") {
+            Write-Warning "$_ is not responding or has high latency. Skipping."
+            Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            ping -n 50 $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append    
+            Test-Connection -Count 50 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
     }
 }
 
 if ($ShortOrLong -eq 2) {
     Write-Host "Running long ping test..."
+    Write-Host ""
     $Custom2 | ForEach-Object -ThrottleLimit 20 -Verbose -Parallel {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
+        $AliveTest | Out-File -FilePath $using:OutLocation\$_.txt
         if ($AliveTest.status -notcontains "Success") {
-            Write-Warning "Dead host at $_ or high latency. Skipping"
+            Write-Warning "$_ is not responding or has high latency. Skipping."
+            Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            ping -n 250 $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            Test-Connection -Count 250 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
     }
 }
@@ -63,22 +69,38 @@ if ($ShortOrLong -eq 2) {
 $Files = Get-ChildItem $OutLocation
 
 #Write result to host/console (Reports issues only)
+Write-Host ""
+Write-Host "Final results:"
+Write-Host ""
 foreach ($File in $Files) {
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
-    if ($Content -match 'timed out') {
-        Write-host "$Filename dropped packets"
+    if ("$Content" -match 'TimedOut') {
+        if ("$Content" -match 'is not responding or has high latency') {
+            Write-Warning "$Filename is not responding or has high latency."
+        }
+        else {
+            Write-Host "$Filename dropped packets."
+        }
     }
 }
+Write-Host ""
 
 #Write results to file (All results recorded)
 foreach ($File in $Files) { 
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName
-    if ($Content -match 'timed out') {
-        Write-Output "$Filename dropped packets" | Out-file -Force -Path $Results -Append
+    if ("$Content" -match 'TimedOut') {
+        if ("$Content" -match 'is not responding or has high latency') {
+            Write-Output "$Filename is not responding or has high latency." | Out-file -Path $Results -Force -Append
+        }
+        else {
+            Write-Output "$Filename dropped packets." | Out-file -Path $Results -Force -Append
+        }
     }
     else {
-        Write-Output "$Filename is ok" | Out-File -Force -Path $Results -Append
+        Write-Output "$Filename is ok. Check for latency." | Out-File -Path $Results -Force -Append
     }
 }
+Write-Host "All results recorded to $OutLocation\Results.txt."
+Write-Host ""

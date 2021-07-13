@@ -6,6 +6,11 @@
 $OutLocation = #Locaiton
 $Results = #$OutLocation\Results.txt
 $CSV = #CSV File
+$Low = 50
+$Med = 30
+$High = 20
+$ShortPingAmount = 50
+$LongPingAmount = 250
 
 #Create PSobject with ips parsed from CSV
 $Custom1 = Import-Csv $CSV | ForEach-Object {[PSCustomObject]@{
@@ -20,8 +25,8 @@ Write-Host "
 
 Options:
 
-1. Short test (50 pings)
-2. Long test (250 pings)
+1. Short test ($ShortPingAmount pings)
+2. Long test ($LongPingAmount pings)
 "
 do {
     $ShortOrLong = Read-Host -Prompt "Select an option"
@@ -32,9 +37,28 @@ do {
 while ($ShortOrLong -notin 1..2)
 Write-Host ""
 
+#Ask for sensitivity level
+do {
+    Write-Host "
+Sensitivity Options:
+
+1. Low (>=$Low ms)
+2. Medioum (>=$Med ms)
+3. High (>=$High ms)
+4. Do not report on latency
+"
+    $LatencyPick = Read-Host -Prompt "Select a latency option"
+    if ($LatencyPick -notin 1..4) {
+        Write-Warning "Please pick a valid option"
+    }
+}
+while ($LatencyPick -notin 1..4)
+
 #Parallel ping. Results recorded to each appropriate file
 if ($ShortOrLong -eq 1) {
     Write-Host "Running short ping test..."
+    Write-Host ""
+    Write-Host "Noticed issues:"
     Write-Host ""
     $Custom2 | ForEach-Object -ThrottleLimit 20 -Verbose -Parallel {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
@@ -44,13 +68,40 @@ if ($ShortOrLong -eq 1) {
             Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            Test-Connection -Count 50 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            $PingTest = Test-Connection -Count $using:ShortPingAmount -Ping -IPv4 -DontFragment -TargetName $_
+            $PingTest | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            $IPFile = "$using:OutLocation\$_.txt"
+            switch ($using:LatencyPick) {
+                1 {
+                    if (((($PingTest.Latency) -ge $using:Low).count/$using:ShortPingAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Low).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:Low ms"
+                    }
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Low).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:Low ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                2 {
+                    if (((($PingTest.Latency) -ge $using:Med).count/$using:ShortPingAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Med).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:Med ms"
+                    }    
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Med).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:Med ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                3 {
+                    if (((($PingTest.Latency) -ge $using:High).count/$using:ShortPingAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:High).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:High ms"
+                    }        
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:High).count/$using:ShortPingAmount).ToString("P") + " of packets over $using:High ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                4 {
+                    return
+                }
+            }
         }
     }
 }
 
 if ($ShortOrLong -eq 2) {
     Write-Host "Running long ping test..."
+    Write-Host ""
+    Write-Host "Noticed issues:"
     Write-Host ""
     $Custom2 | ForEach-Object -ThrottleLimit 20 -Verbose -Parallel {
         $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
@@ -60,7 +111,32 @@ if ($ShortOrLong -eq 2) {
             Write-Output "$_ is not responding or has high latency. Skipping." | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
         }
         else {
-            Test-Connection -Count 250 -Ping -IPv4 -DontFragment -TargetName $_ | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            $PingTest = Test-Connection -Count $using:LongPingAmount -Ping -IPv4 -DontFragment -TargetName $_
+            $PingTest | Out-File -FilePath $using:OutLocation\$_.txt -Force -Append
+            $IPFile = "$using:OutLocation\$_.txt"
+            switch ($using:LatencyPick) {
+                1 {
+                    if (((($PingTest.Latency) -ge $using:Low).count/$using:LongPIngAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Low).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:Low ms"
+                    }
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Low).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:Low ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                2 {
+                    if (((($PingTest.Latency) -ge $using:Med).count/$using:LongPIngAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Med).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:Med ms"
+                    }
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:Med).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:Med ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                3 {
+                    if (((($PingTest.Latency) -ge $using:High).count/$using:LongPIngAmount) -gt 0) {
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:High).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:High ms"
+                    }
+                        $PingTest.DisplayAddress.GetValue(0) + " had " + ((($PingTest.Latency) -ge $using:High).count/$using:LongPIngAmount).ToString("P") + " of packets over $using:High ms" | Out-File -FilePath $IPFile -Force -Append
+                }
+                4 {
+                    return
+                }
+            }
         }
     }
 }
@@ -69,9 +145,6 @@ if ($ShortOrLong -eq 2) {
 $Files = Get-ChildItem $OutLocation
 
 #Write result to host/console (Reports issues only)
-Write-Host ""
-Write-Host "Final results:"
-Write-Host ""
 foreach ($File in $Files) {
     $Content = Get-Content -Path $File.FullName
     $Filename = $File.BaseName

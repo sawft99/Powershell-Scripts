@@ -1,3 +1,4 @@
+#Made for PS7!
 $APIKey = #"APIKEY"
 $OrgID = #"ORGID"
 $APIHeader = "X-Cisco-Meraki-API-Key"
@@ -6,7 +7,13 @@ $NetworksListURL = "https://api.meraki.com/api/v1/organizations/$OrgID/networks"
 $NetworkUrl = "https://api.meraki.com/api/v1/networks"
 $DevicesURL = "https://api.meraki.com/api/v1/devices"
 
+#Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri $APIRequestURL -SessionVariable MerakiSession -ErrorVariable APITest
+#if ($APITest.message -match "Invalid API Key") {
+#    Write-Host "Bad API Key. Exiting..."
+#    Exit
+#}
 $test2 = (Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri $NetworksListURL -SessionVariable MerakiSession).Content | ConvertFrom-Json | Sort-Object -Property Name
+
 $Test2Count = 1
 $Test2 | ForEach-Object {
     $_ | Add-Member -MemberType NoteProperty -Name Line -Value $Test2Count -Force
@@ -29,84 +36,104 @@ if ($NetworkSelect -match "all") {
 }
 else {
     $Test3 = $Test2 | Where-Object -Property Line -eq $NetworkSelect
-    $SiteDevices = ForEach ($Something in $Test3.id) {(Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -Uri ("$NetworkURL/" + $Something + "/devices" )) | ConvertFrom-Json}
+    $SiteDevices = ForEach ($Something in $Test3.id) {(Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Something + "/devices" )) | ConvertFrom-Json}
 }
 $Test3 | Where-Object -Property Line -eq $NetworkSelect | Format-Table -Property Line, Name, ID
-function Tasks {
+
+function AllTask {
     Write-Host "
 Choose a task:
+    
 
-1. Reboot specific AP at site
-2. Reboot all AP's at site
-3. Reboot all AP's in organization (takes some time)
-4. Get all AP's info at site
-5. Get all AP's info in organization (takes some time)
+1. Get all AP's info in organization (takes some time)
+2. Reboot all AP's in organization (takes some time)
 
 "
+}
+function NetTasks {
+Write-Host "
+
+1. Get all AP's info at site
+2. Reboot specific AP at site
+3. Reboot all AP's at site
+
+"
+}
+if ($NetworkSelect -match "all") {
+    AllTasks
     do {
-        $global:TaskSelect = Read-Host -Prompt 'Select a task'
-        if ($global:TaskSelect -notin 1..6) {
-            Write-Host Pick a valid option
+        $AllTaskSelect = Read-Host -Prompt 'Select a task'
+        if ($TaskSelect -notin 1..3) {
+            Write-Host 'Pick a valid option'
         }
     }
-    while ($global:TaskSelect -notin 1..6) {
+    while ($TaskSelect -notin 1..3) {
     }
 }
-Tasks
-switch ($global:TaskSelect) {
-    1 {
-        $DeviceTableCount = 1
-        $SiteDevices | ForEach-Object {
-            $_ | Add-Member -MemberType NoteProperty -Name Line -Value $DeviceTableCount -Force
-            $DeviceTableCount++
-        }
-        $SiteDevices | Sort-Object -Property name | Format-Table -Property Line, Name, LanIP, MAC, Serial, Model
-        Write-Host
-        do {
-            $APLineSelect = Read-Host -Prompt "Select an AP to reboot"
-        }
-        while ($APLineSelect -notin $SiteDevices.Line) {
-        }
-        $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
-        $APSelectSerial = $APSelect.Serial
-        Write-Host "Rebooting"$APSelect.Name"AP"
-        Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Post -Uri ("$DevicesURL" + "/$APSelectSerial"  + "/reboot" ) | ConvertFrom-Json
-    }
-    2 {
-        $DeviceTableCount = 1
-        $SiteDevices | ForEach-Object {
-            $_ | Add-Member -MemberType NoteProperty -Name Line -Value $DeviceTableCount -Force
-            $DeviceTableCount++
-        }
-        $SiteDevices | Sort-Object -Property name | Format-Table -Property Line, Name, LanIP, MAC, Serial, Model
-        foreach ($AP in $SiteDevices.Serial) {
-            Write-Host "Rebooting"$SiteDevices.Name"AP"
-            Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Post -Uri ("$DevicesURL" + "/$AP"  + "/reboot" ) | ConvertFrom-Json
+else {
+    NetTasks
+    do {
+        $NetTaskSelect = Read-Host -Prompt 'Select a task'
+        if ($NetTaskSelect -notin 1..2) {
+            Write-Host 'Pick a valid option'
         }
     }
-    3 {
-        ForEach-Object -InputObject $AllSerials {
-            Write-Host "Rebooting:" $Test3.name
-            Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Post -Uri "$DevicesURL/" + "$_" + "/reboot"
-        }
+    while ($NetTaskSelect -notin 1..2) {
     }
-    4 {
-        $SiteDevices | Format-Table -Property Name, LanIP, MAC, Serial
-    }
-    5 {
-        $Test4 = @()
-        ForEach ($Something in $Test2) {
-            Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri ("https://api.meraki.com/api/v1/networks/" + $Something.id + "/devices" ) | ConvertFrom-Json
-            $Test4Table = "" | Select-Object Name, LanIP, MAC, Serial
-            $Test4Table.Name = $Something.Name
-            $Test4Table.LanIP = $Something.LanIP
-            $Test4Table.Mac = $Something.Mac
-            $Test4Table.Serial = $Something.Serial
-            $Test4 += $Test4Table
-        }
-        $Test4
-    }
-    6 {
+}
 
+if ($null -ne $AllTaskSelect) {
+    switch ($AllTaskSelect) {
+        1 {
+            $SiteDevices = ForEach ($Network in $Test3) {
+                Write-Progress -Activity "Fetching Info" -Status "Gathering info from"$Network.Name""
+                Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices")
+            }
+            $SiteDevices | Format-Table name, LanIP, Mac, Serial, Model
+        }
+        2 {
+            ForEach ($Network in $Test3) {
+                $SiteDevices = Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices")
+                ForEach ($AP in $SiteDevices) {
+                    Write-Progress -Actvity "Rebooting devices..." -Status "Rebooting"$AP.Name"for"$Network.Name""
+                    Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $AP.serial + "/devices")
+                }                
+            }
+        }
+    }
+}
+
+if ($null -ne $NetTaskSelect) {
+    switch ($NetTaskSelect) {
+        1 {
+            $SiteDevices | Format-Table -Property Name, LanIP, MAC, Serial, Model
+        }
+        2 {
+            $DeviceTableCount = 1
+            $SiteDevices | ForEach-Object {
+                $_ | Add-Member -MemberType NoteProperty -Name Line -Value $DeviceTableCount -Force
+                $DeviceTableCount++
+            }
+            $SiteDevices | Sort-Object -Property name | Format-Table -Property Line, Name, LanIP, MAC, Serial, Model
+            Write-Host ''
+            do {
+                $APLineSelect = Read-Host -Prompt "Select an AP to reboot"
+            }
+            while ($APLineSelect -notin $SiteDevices.Line) {
+            }
+            $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
+            $APSelectSerial = $APSelect.Serial
+            Write-Host "Rebooting" $APSelect.Name "AP"
+            Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $APSelectSerial  + "/reboot") | ConvertFrom-Json
+        }
+        3 {
+            ForEach ($Something in $SiteDevices.id) {
+                Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Something + "/devices") | ConvertFrom-Json
+            }
+            ForEach-Object -InputObject $SiteDevices {
+                Write-Host "Rebooting:" $_.name "AP"
+                Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $_.serial + "/reboot") | ConvertFrom-Json
+            }
+        }
     }
 }

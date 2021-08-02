@@ -65,11 +65,11 @@ if ($NetworkSelect -match "all") {
     AllTasks
     do {
         $AllTaskSelect = Read-Host -Prompt 'Select a task'
-        if ($TaskSelect -notin 1..3) {
+        if ($AllTaskSelect -notin 1..3) {
             Write-Host 'Pick a valid option'
         }
     }
-    while ($TaskSelect -notin 1..3) {
+    while ($AllTaskSelect -notin 1..3) {
     }
 }
 else {
@@ -95,10 +95,11 @@ if ($null -ne $AllTaskSelect) {
         }
         2 {
             ForEach ($Network in $Test3) {
-                $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices")
+                $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices") | ConvertFrom-Json
                 ForEach ($AP in $SiteDevices) {
-                    Write-Progress -Actvity "Rebooting devices..." -Status "Rebooting"$AP.Name"for"$Network.Name""
-                    Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $AP.serial + "/devices")
+                    Write-Progress -Activity "Rebooting devices..." -PercentComplete ($i/$Test3.line.count)
+                    Write-Host Rebooting $AP.name AP at $Network.name
+                    Invoke-WebRequest -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $AP.serial + "/reboot") | Out-Null
                 }                
             }
         }

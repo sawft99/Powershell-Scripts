@@ -18,7 +18,7 @@ $NetworkFetch | Format-Table -Property Line, Name, ID
 
 do {
     $NetworkLineSelect = Read-Host -Prompt 'Select network via line or type "all" for all networks'
-    if ($NetworkLineSelect -notin $NetworkFetch.line -or "all") {
+    if ($NetworkLineSelect -notin $NetworkFetch.line -xor $NetworkLineSelect -match "all") {
         Write-Host "Pick a valid option"
     }
 }    
@@ -36,16 +36,14 @@ else {
 $NetworkSelect | Where-Object -Property Line -eq $NetworkLineSelect | Format-Table -Property Line, Name, ID
 
 function AllTasks {
-    Write-Host "
-Choose a task:
+    Write-Host "Choose a task:
 
 1. Get all AP's info in organization (takes some time)
 2. Reboot all AP's in organization (takes some time)
-
 "
 }
 function NetTasks {
-Write-Host "
+Write-Host " Choose a task:
 
 1. Get all AP's info at site
 2. Get specific AP info at site
@@ -53,7 +51,7 @@ Write-Host "
 4. Reboot all AP's at site
 5. Get client list from all APs at site
 6. Get client list from specific AP at site
-
+7. Blink LED's on AP
 "
 }
 if ($NetworkLineSelect -match "all") {
@@ -71,11 +69,11 @@ else {
     NetTasks
     do {
         $NetTaskSelect = Read-Host -Prompt 'Select a task'
-        if ($NetTaskSelect -notin 1..6) {
+        if ($NetTaskSelect -notin 1..7) {
             Write-Host 'Pick a valid option'
         }
     }
-    while ($NetTaskSelect -notin 1..6) {
+    while ($NetTaskSelect -notin 1..7) {
     }
 }
 
@@ -176,6 +174,34 @@ if ($null -ne $NetTaskSelect) {
             $ClientInfo = Invoke-WebRequest -method get -Uri ("$DevicesURL/" + $APSelectSerial + "/clients") -WebSession $MerakiSession | ConvertFrom-Json
             Write-Host "Clients for" $APSelect.Name "AP"
             $ClientInfo | Sort-Object -Property Description | Format-table -Property Description, ip, mac, user
+        }
+        7 {
+            $DeviceTableCount = 1
+            $SiteDevices | ForEach-Object {
+                $_ | Add-Member -MemberType NoteProperty -Name Line -Value $DeviceTableCount -Force
+                $DeviceTableCount++
+            }
+            $SiteDevices | Sort-Object -Property name | Format-Table -Property Line, Name, LanIP, MAC, Serial, Model
+            Write-Host ''
+            do {
+                $APLineSelect = Read-Host -Prompt "Select an AP to blink LED's on"
+            }
+            while ($APLineSelect -notin $SiteDevices.Line) {
+            }
+            $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
+            $APSelectSerial = $APSelect.Serial
+            do {
+                $LEDLengthPrompt = Read-host -Prompt "Enter # of seconds to blink LED (Between 1 - 120)"
+            }
+            while ($LEDLengthPrompt -notin 1..120)
+            $BlinkForm = @{
+                "duration" = $LEDLengthPrompt
+                "period"= 100
+                "duty" = 10
+            }
+            Write-Host ''
+            Write-Host "Blinking" $APSelect.Name "AP for $LEDLengthPrompt seconds"
+            Invoke-WebRequest -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $APSelectSerial  + "/blinkLeds") -Form $BlinkForm | ConvertFrom-Json | Out-Null
         }
     }
 }

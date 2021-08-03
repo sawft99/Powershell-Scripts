@@ -2,43 +2,38 @@
 $APIKey = #"APIKEY"
 $OrgID = #"ORGID"
 $APIHeader = "X-Cisco-Meraki-API-Key"
-#$APIRequestURL = "https://api.meraki.com/api/v1/organizations/$OrgID/apiRequests"
+$OrgURL = "https://api.meraki.com/api/v1/organizations/$OrgID"
 $NetworksListURL = "https://api.meraki.com/api/v1/organizations/$OrgID/networks"
 $NetworkUrl = "https://api.meraki.com/api/v1/networks"
 $DevicesURL = "https://api.meraki.com/api/v1/devices"
 
-#Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri $APIRequestURL -SessionVariable MerakiSession -ErrorVariable APITest
-#if ($APITest.message -match "Invalid API Key") {
-#    Write-Host "Bad API Key. Exiting..."
-#    Exit
-#}
-$test2 = (Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri $NetworksListURL -SessionVariable MerakiSession).Content | ConvertFrom-Json | Sort-Object -Property Name
+$NetworkFetch = (Invoke-WebRequest -Headers @{$APIHeader = $APIKey} -Uri $NetworksListURL -SessionVariable MerakiSession).Content | ConvertFrom-Json | Sort-Object -Property Name
 
-$Test2Count = 1
-$Test2 | ForEach-Object {
-    $_ | Add-Member -MemberType NoteProperty -Name Line -Value $Test2Count -Force
-    $Test2Count++
+$NetworkFetchCount = 1
+$NetworkFetch | ForEach-Object {
+    $_ | Add-Member -MemberType NoteProperty -Name Line -Value $NetworkFetchCount -Force
+    $NetworkFetchCount++
 }
-$test2 | Format-Table -Property Line, Name, ID
+$NetworkFetch | Format-Table -Property Line, Name, ID
 
 do {
-    $NetworkSelect = Read-Host -Prompt 'Select network via line or type "all" for all networks'
-    if ($NetworkSelect -notin $Test2.line -or "all") {
+    $NetworkLineSelect = Read-Host -Prompt 'Select network via line or type "all" for all networks'
+    if ($NetworkLineSelect -notin $NetworkFetch.line -or "all") {
         Write-Host "Pick a valid option"
     }
 }    
-while (!($NetworkSelect -in $test2.line -xor $NetworkSelect -match "all")) {
+while (!($NetworkLineSelect -in $NetworkFetch.line -xor $NetworkLineSelect -match "all")) {
     }
 
 Write-Host "Gathering info please wait..."
-if ($NetworkSelect -match "all") {
-    $Test3 = $test2
+if ($NetworkLineSelect -match "all") {
+    $NetworkSelect = $NetworkFetch
 }
 else {
-    $Test3 = $Test2 | Where-Object -Property Line -eq $NetworkSelect
-    $SiteDevices = ForEach ($Something in $Test3.id) {(Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Something + "/devices" )) | ConvertFrom-Json}
+    $NetworkSelect = $NetworkFetch | Where-Object -Property Line -eq $NetworkLineSelect
+    $SiteDevices = ForEach ($Something in $NetworkSelect.id) {(Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Something + "/devices" )) | ConvertFrom-Json}
 }
-$Test3 | Where-Object -Property Line -eq $NetworkSelect | Format-Table -Property Line, Name, ID
+$NetworkSelect | Where-Object -Property Line -eq $NetworkLineSelect | Format-Table -Property Line, Name, ID
 
 function AllTasks {
     Write-Host "
@@ -61,15 +56,15 @@ Write-Host "
 
 "
 }
-if ($NetworkSelect -match "all") {
+if ($NetworkLineSelect -match "all") {
     AllTasks
     do {
         $AllTaskSelect = Read-Host -Prompt 'Select a task'
-        if ($AllTaskSelect -notin 1..3) {
+        if ($AllTaskSelect -notin 1..2) {
             Write-Host 'Pick a valid option'
         }
     }
-    while ($AllTaskSelect -notin 1..3) {
+    while ($AllTaskSelect -notin 1..2) {
     }
 }
 else {
@@ -87,20 +82,24 @@ else {
 if ($null -ne $AllTaskSelect) {
     switch ($AllTaskSelect) {
         1 {
-            $SiteDevices = ForEach ($Network in $Test3) {
+            $SiteDevices = ForEach ($Network in $NetworkSelect) {
                 Write-Progress -Activity "Fetching Info" -Status "Gathering info from"$Network.Name""
                 Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices")
             }
             $SiteDevices | Format-Table name, LanIP, Mac, Serial, Model
         }
         2 {
-            ForEach ($Network in $Test3) {
+            $Count = 1
+            $DeviceCount = (Invoke-WebRequest -Method get -WebSession $MerakiSession -Uri ("$OrgURL/" + "/devices") | ConvertFrom-Json).count
+            ForEach ($Network in $NetworkSelect) {
                 $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices") | ConvertFrom-Json
                 ForEach ($AP in $SiteDevices) {
-                    Write-Progress -Activity "Rebooting devices..." -PercentComplete ($i/$Test3.line.count)
+                    $Percent = [math]::round(($count/$DeviceCount)*100)
+                    Write-Progress -Activity "Rebooting all AP's" -Status "$Percent% done" -PercentComplete $Percent
                     Write-Host Rebooting $AP.name AP at $Network.name
-                    Invoke-WebRequest -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $AP.serial + "/reboot") | Out-Null
-                }                
+                    Invoke-WebRequest -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $AP.serial + "/reboot") -MaximumRetryCount 5 | Out-Null
+                    $Count ++
+                }
             }
         }
     }
@@ -156,7 +155,7 @@ if ($null -ne $NetTaskSelect) {
             $ClientInfo = foreach ($AP in $SiteDevices) {
                 Invoke-WebRequest -method get -Uri ("$DevicesURL/" + $AP.Serial + "/clients") -WebSession $MerakiSession | ConvertFrom-Json
             }
-            Write-Host "Clients for Network" $Test3.Name 
+            Write-Host "Clients for Network" $NetworkSelect.Name 
             $ClientInfo | Sort-Object -Property Description | Format-table -Property Description, ip, mac, user
         }
         6 {

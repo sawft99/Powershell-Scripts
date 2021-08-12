@@ -80,23 +80,36 @@ else {
 if ($null -ne $AllTaskSelect) {
     switch ($AllTaskSelect) {
         1 {
-            $SiteDevices = ForEach ($Network in $NetworkSelect) {
-                Write-Progress -Activity "Fetching Info" -Status "Gathering info from"$Network.Name""
-                Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices")
+            $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$OrgURL" + "/devices") | ConvertFrom-Json
+            $DeviceCount = (Invoke-WebRequest -Method get -WebSession $MerakiSession -Uri ("$OrgURL/" + "/devices") | ConvertFrom-Json).count
+            $LineCount = 1
+            $ProgressCount = 1
+            ForEach ($AP in $SiteDevices) {
+                $ProgressPreference = 'Continue'
+                $Percent = [math]::round(($ProgressCount/$DeviceCount)*100)
+                Write-Progress -Activity "Gathering Info for all AP's" -Status "$Percent% done" -PercentComplete $Percent
+                $ProgressPreference = 'SilentlyContinue'
+                Add-Member -InputObject $AP -MemberType NoteProperty -Name Line -Value $LineCount
+                $LineCount ++
+                $APNetwork = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $AP.NetworkID) | ConvertFrom-Json
+                Add-Member -InputObject $AP -MemberType NoteProperty -Name NetworkName $APNetwork.Name
+                $ProgressCount ++
             }
-            $SiteDevices | Format-Table name, LanIP, Mac, Serial, Model
+            $SiteDevices | Format-Table -Property Line, NetworkName, Name, Serial, LANIP, Mac, Model, address, ConfigurationUpdatedAt
         }
         2 {
-            $Count = 1
+            $ProgressCount = 1
             $DeviceCount = (Invoke-WebRequest -Method get -WebSession $MerakiSession -Uri ("$OrgURL/" + "/devices") | ConvertFrom-Json).count
             ForEach ($Network in $NetworkSelect) {
                 $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$NetworkURL/" + $Network.id + "/devices") | ConvertFrom-Json
                 ForEach ($AP in $SiteDevices) {
-                    $Percent = [math]::round(($count/$DeviceCount)*100)
+                    $ProgressPreference = 'Continue'
+                    $Percent = [math]::round(($ProgressCount/$DeviceCount)*100)
                     Write-Progress -Activity "Rebooting all AP's" -Status "$Percent% done" -PercentComplete $Percent
                     Write-Host Rebooting $AP.name AP at $Network.name
+                    $ProgressPreference = 'SilentlyContinue'
                     Invoke-WebRequest -Method Post -WebSession $MerakiSession -Uri ("$DevicesURL/" + $AP.serial + "/reboot") -MaximumRetryCount 5 | Out-Null
-                    $Count ++
+                    $ProgressCount ++
                 }
             }
         }

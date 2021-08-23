@@ -1,4 +1,4 @@
-﻿# Script to make popup to be ack'd for confirmation of symptoms. Text file in appdata so it detects on a per user basis rather than whole computer.
+﻿# Script that makes a popup to be ack'd for confirmation of symptoms. Text file in appdata so it detects on a per user basis rather than whole computer.
 # Add Framework/Variables
 Add-Type -AssemblyName System.Windows.Forms
 Set-ExecutionPolicy Unrestricted

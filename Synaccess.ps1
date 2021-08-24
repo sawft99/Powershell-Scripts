@@ -21,8 +21,8 @@ do {
     $Username = Read-Host -Prompt Username
     $Password = Read-Host -Prompt Password -AsSecureString
     [PSCredential]$Credentials = New-Object System.Management.Automation.PSCredential ($Username, $Password)
-    $SynTest = Invoke-WebRequest -Uri ("http://$Global:IP") -Credential $Credentials -Authentication Basic -AllowUnencryptedAuthentication -SkipCertificateCheck -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError | Out-Null
-    if ($SynTest.Content -notmatch "<title>Synaccess netBooter</title>" -or $ConnectError.length -ne 0) {
+    $SynTest = Invoke-WebRequest -Uri ("http://$Global:IP") -Credential $Credentials -Authentication Basic -AllowUnencryptedAuthentication -SkipCertificateCheck -SessionVariable Session -ErrorAction SilentlyContinue -ErrorVariable ConnectError
+    if ($SynTest.Content -notmatch "<title>Synaccess netBooter</title>" -or $Null -ne $ConnectError.length) {
         Clear-Host
         Write-Host "$Global:IP is not a Synaccess or creds are not proper"
         SynIP

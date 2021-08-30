@@ -15,7 +15,6 @@ if (Test-Path "C:\Program Files (x86)\Dropbox\Client\Dropbox.exe") {
     $results | Out-File $OutLocation\dropboxdetect.txt
     }
     
-    
 if ($null -eq $results) {
     $results = "None"
     $results | Out-File $OutLocation\dropboxdetect.txt

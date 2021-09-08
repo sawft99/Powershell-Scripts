@@ -80,14 +80,15 @@ else {
 if ($null -ne $AllTaskSelect) {
     switch ($AllTaskSelect) {
         1 {
-            $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$OrgURL" + "/devices") | ConvertFrom-Json
+            #$SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$OrgURL" + "/devices") | ConvertFrom-Json
+            $SiteDevices = Invoke-WebRequest -Method Get -WebSession $MerakiSession -Uri ("$OrgURL" + "/devices/statuses") | ConvertFrom-Json
             $DeviceCount = (Invoke-WebRequest -Method get -WebSession $MerakiSession -Uri ("$OrgURL/" + "/devices") | ConvertFrom-Json).count
             $LineCount = 1
             $ProgressCount = 1
             ForEach ($AP in $SiteDevices) {
                 $ProgressPreference = 'Continue'
                 $Percent = [math]::round(($ProgressCount/$DeviceCount)*100)
-                Write-Progress -Activity "Gathering Info for all AP's" -Status "$Percent% done" -PercentComplete $Percent
+                Write-Progress -Activity "Gathering info for all AP's" -Status "$Percent% done" -PercentComplete $Percent
                 $ProgressPreference = 'SilentlyContinue'
                 Add-Member -InputObject $AP -MemberType NoteProperty -Name Line -Value $LineCount
                 $LineCount ++
@@ -95,7 +96,8 @@ if ($null -ne $AllTaskSelect) {
                 Add-Member -InputObject $AP -MemberType NoteProperty -Name NetworkName $APNetwork.Name
                 $ProgressCount ++
             }
-            $SiteDevices | Format-Table -Property Line, NetworkName, Name, Serial, LANIP, Mac, Model, address, ConfigurationUpdatedAt
+            $SiteDevices | Format-Table -Property Line, Name, Serial, LANIP, Mac, Model, NetworkName, PublicIP, Status 
+            #address, ConfigurationUpdatedAt
         }
         2 {
             $ProgressCount = 1

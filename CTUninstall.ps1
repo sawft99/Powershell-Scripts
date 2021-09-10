@@ -21,13 +21,17 @@ $InstallLocShort = $InstallLoc.Name
 foreach ($Folder in $InstallLocShort) {
     if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq "True") {
         Start-Process -Wait -NoNewWindow -FilePath ('C:\ProgramData\Package Cache\' + $Folder + '\MCTSetup.exe') -ArgumentList "/quiet", "/norestart", "/uninstall"
-        Remove-Item -Recurse -Force -Path ('C:\ProgramData\Package Cache\' + $Folder)
+        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq "True") {
+            Remove-Item -Recurse -Force -Path ('C:\ProgramData\Package Cache\' + $Folder)
+        }
     }
 }
 foreach ($Folder in $InstallLocShort) {
     if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq "True") {
         Start-Process -Wait -NoNewWindow -FilePath ('C:\Windows\System32\msiexec.exe') -ArgumentList "/x `"C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi`" /quiet /norestart"
-        Remove-Item -Recurse -Force -Path ("C:\ProgramData\Package Cache\$Folder")
+        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq "True") {
+            Remove-Item -Recurse -Force -Path ("C:\ProgramData\Package Cache\$Folder")
+        }
     }
 }
 

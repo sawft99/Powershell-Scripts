@@ -9,7 +9,7 @@ $OutLocation = #"C:\Location"
 $Results = "$OutLocation\Results.txt"
 $CSV = #"C:\CSVFile.csv"
 #Note Variables represent thresholds in milliseconds. Reporting will display anything over the values. For example 
-#MinLatency = 20, will report x% of packets over 50 ms
+#MinLatency = 50, will report x% of packets over 50 ms
 #MedLatency = 30, will  report x% of packets over 30 ms
 #IdealLatency = 20, will  report x% of packets over 20 ms
 #Reporting in the console will create a tabed cascading list to show how much of each condition was met from highest threshold to lowest.

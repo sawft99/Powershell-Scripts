@@ -1,6 +1,7 @@
 # Powershell-Scripts
 Various PS scripts I've made or used.
 
+* MoveDisabledComputers.ps1 - Move computers older than x date and delete those greater than x date.
 * COVID19PopUp.ps1 - Popup for a Covid acknowledgement asking emplyees about symptoms.
 * CTUninstall.ps1 - Uninstall Sonicwall Connect Tunnel and remove extras left behind.
 * DetectNIC.ps1 - Detect wireless NIC and report to text file.

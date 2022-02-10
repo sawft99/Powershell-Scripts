@@ -2,7 +2,7 @@
 #1. Finds computers not logged into for X days and disables them.
 #2. Moves those disabled computers to a new OU.
 #3. Checks the disabled OU for disabled computers not logged into for X days and deletes them.
-
+#4. Writes disabled/moved/deleted computers to console.
 #DisableDateCutoff and DeleteDateCutoff dates measured in days. Example '$DisableDateCutoff = 90' for 90 days less than current date
 
 #Working OUs and date variables
@@ -31,6 +31,6 @@ $DisabledComputers = Get-ADComputer -SearchBase $DisabledPCsOU -SearchScope 2 -F
 ForEach ($DisabledComputer in $DisabledComputers) {
     If ((New-TimeSpan -Start ($DisabledComputer.LastLogonDate) -End $CurrentDate).Days -GT $DeleteDateCutoff) {
         Remove-ADComputer -Identity $DisabledComputer.ObjectGUID
-        Write-Host $Computer.Name deleted
+        Write-Host $DisabledComputer.Name deleted
     }
 }

@@ -110,7 +110,6 @@ function CreateHashFile {
     return $HashCalcTable
 }
 
-#Option to compare single file to list of hashes?
 function VerifyHashFile {
     $HashOp = AskHash
     Write-Host ""

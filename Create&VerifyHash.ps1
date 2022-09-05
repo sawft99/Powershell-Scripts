@@ -1,5 +1,6 @@
 ﻿#Create and/or verify a hash with Windows certutil
 #Made because I didn't know 'Get-FileHash' existed
+#For verifyhashfolder function a text file with one hash per line will work
 
 #Types of hashes
 $HashTypes = "MD2","MD4","MD5","SHA1","SHA256","SHA384","SHA512"

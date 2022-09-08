@@ -13,9 +13,9 @@ If ($FolderExist -eq $false) {
     }
 
 # If $file exists $runonce is equal to whatever content is inside the file, else $runonce equals 0.
-if (Test-Path $File) {
+If (Test-Path $File) {
     $FileContent = Get-ChildItem ($File) | Where-Object {$_.LastWriteTime.Date -ge $lastRun}
-    if ($null -eq $FileContent) {
+    If ($null -eq $FileContent) {
         $RunOnce = 0
     }
     Else {
@@ -27,8 +27,8 @@ Else {
 }
 
 # If $runonce is equal to 0 show the popup.
-if ($RunOnce -eq 0) {
-[System.Windows.Forms.MessageBox]::Show("Before you begin your workday please review the following:
+If ($RunOnce -eq 0) {
+    [System.Windows.Forms.MessageBox]::Show("Before you begin your workday please review the following:
 
 Within the past 2 weeks have you had any of the following:
 
@@ -42,10 +42,11 @@ Within the past 2 weeks have you had any of the following:
 
 If you answered yes to any of the above question you must contact your direct manager or leader before you begin your work day.
 
-Please click ‘OK’ below indicating your understanding and acceptance of this self-assessment." , "COVID-19 Employee Self-Assessment" ,[System.Windows.Forms.MessageBoxButtons]::OK)
+Please click ‘OK’ below indicating your understanding and acceptance of this self-assessment." , "COVID-19 Employee Self-Assessment" ,[System.Windows.Forms.MessageBoxButtons]::OK
+)
 
 # Convert $runonce to an interger as a new variable since there are times when adding to it caused problems as a string. Output value to $File. 
-$runOnceint = [int]$runOnce
-$runOnceint++
-$runOnceint | Out-File ($File) -Force
+    $runOnceint = [int]$runOnce
+    $runOnceint++
+    $runOnceint | Out-File ($File) -Force
 }

@@ -19,30 +19,30 @@ foreach ($Install in $Installs) {
 $InstallLoc = Get-ChildItem "C:\ProgramData\Package Cache"
 $InstallLocShort = $InstallLoc.Name
 foreach ($Folder in $InstallLocShort) {
-    if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq "True") {
+    if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq $true) {
         Start-Process -Wait -NoNewWindow -FilePath ('C:\ProgramData\Package Cache\' + $Folder + '\MCTSetup.exe') -ArgumentList "/quiet", "/norestart", "/uninstall"
-        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq "True") {
+        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\MCTSetup.exe") -eq $true) {
             Remove-Item -Recurse -Force -Path ('C:\ProgramData\Package Cache\' + $Folder)
         }
     }
 }
 foreach ($Folder in $InstallLocShort) {
-    if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq "True") {
+    if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq $true) {
         Start-Process -Wait -NoNewWindow -FilePath ('C:\Windows\System32\msiexec.exe') -ArgumentList "/x `"C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi`" /quiet /norestart"
-        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq "True") {
+        if ((Test-Path -Path "C:\ProgramData\Package Cache\$Folder\ConnectTunnel.msi") -eq $true) {
             Remove-Item -Recurse -Force -Path ("C:\ProgramData\Package Cache\$Folder")
         }
     }
 }
 
-if ((Test-Path -Path "C:\Program Files\SonicWall\Modern Connect Tunnel") -eq "True") {
+if ((Test-Path -Path "C:\Program Files\SonicWall\Modern Connect Tunnel") -eq $true) {
     Remove-Item -Recurse -Force -Path ("C:\Program Files\SonicWall\Modern Connect Tunnel")
 }
 
 #Clear appdata of old profile/config
 $Users = Get-ChildItem C:\Users\ -Name
 foreach ($User in $Users) {
-    if ((Test-Path C:\Users\$User\Appdata\Local\Sonicwall -Filter *snwl*) -eq $true) {
+    if ((Test-Path C:\Users\$User\Appdata\Local\Sonicwall -filter *snwl*) -eq $true) {
         if ((Get-ChildItem C:\Users\$User\AppData\Local\SonicWall -filter *SnwlConnect*).Length -gt 0) {
             $SnwlFolder = Get-ChildItem C:\Users\$User\AppData\Local\SonicWall -filter *SnwlConnect*
             $SnwlFolderFull = $SnwlFolder.FullName

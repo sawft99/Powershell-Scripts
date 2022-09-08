@@ -14,7 +14,9 @@ function SynIP {
     }
     until ($AliveTest.Status -eq "Success")
 }
+
 SynIP
+
 do {
     Write-Host ""
     $ConnectError = $null
@@ -39,11 +41,11 @@ Operations:
 2. Toggle On/Off
 3. Exit script
 "
-$global:ActionSelection = Read-Host -Prompt "Which operation?" -ErrorAction SilentlyContinue
-if (!($global:ActionSelection -in 1..3)) {
-    Write-Host ""
-    Write-Warning "Please pick a valid option"
-    Tasks
+    $global:ActionSelection = Read-Host -Prompt "Which operation?" -ErrorAction SilentlyContinue
+    if (!($global:ActionSelection -in 1..3)) {
+        Write-Host ""
+        Write-Warning "Please pick a valid option"
+        Tasks
     }
 }
 
@@ -88,7 +90,7 @@ function Operations {
                 }
                 3 {
                     Write-Host ""
-                    Write-Warning "Rebooting Port 3x"
+                    Write-Warning "Rebooting Port 3"
                     Invoke-WebRequest ("http://" + $Global:IP + "/cmd.cgi?rb=2") -WebSession $Session | Out-Null
                 }
                 4 {

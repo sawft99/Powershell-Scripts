@@ -19,7 +19,7 @@ $IdealLatency = 30
 
 #Create PSobject with ips parsed from CSV
 $IPListCSV = Import-Csv $CSV | ForEach-Object {[PSCustomObject]@{
-    'IPaddress' = $_.IP_Address}
+    'IPAddress' = $_.IP_Address}
 }
 
 #Shorten IPListCSV Object
@@ -36,11 +36,13 @@ do {
         Write-Host ""
     }
 } while ($PingAmount.GetType().Name -ne "Int32")
+
 Clear-Host
 Write-Host "Running Ping Test..."
 Write-Host ""
 Write-Host "Noticed Issues:"
 Write-Host ""
+
 $IPList | ForEach-Object -ThrottleLimit 10 -Verbose -Parallel {
     $AliveTest = Test-Connection -Count 3 -Ping -IPv4 -DontFragment -TargetName $_
     $IPFile = "$using:OutLocation\$_.txt"

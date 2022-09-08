@@ -1,5 +1,4 @@
-#Finds Chromes GUID and stored it into a registry key.
-#Made to have reg key read from an outside program at a later time.
+#Finds Chromes GUID and stores it in a registry key.
 
 $RAWDATA = get-wmiobject Win32_Product | Where-Object -Property Name -Like "*chrome*"
 $ChromeGUID = $RAWDATA.IdentifyingNumber -replace "{" -replace "}"

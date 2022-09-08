@@ -18,5 +18,6 @@ Various PS scripts
 * PingTest.ps1					- Ping one at a time and record results.
 * PingTestParallel.ps1 			- Ping several points at once and collect info to files.
 * PingWithTime.ps1 				- Ping with timestamp next to it.
+* RealtekSoundReset.ps1   - Disables and renables realtek audio device when headphones are not recognized.
 * SonicwallConfigDecryptor.ps1 	- Decrypt Sonicwall config files.
 * Synaccess.ps1					- Basic tasks in Synaccess in PDU. Reboot and toggle ports.

@@ -14,7 +14,7 @@ else {
         #Check for Realtek sound hardware
         $HardwareCheck = (Get-PnpDevice -FriendlyName 'Realtek(R) Audio' -ErrorAction SilentlyContinue).InstanceID
         if ($Null -eq $HardwareCheck -or $HardwareCheck.Count -eq 0) {
-            Write-Error "Could not find Realtek audio device..."
+            Write-Host -ForegroundColor Red "Could not find Realtek audio device..."
             Write-Host ""
             Pause
             Exit
@@ -22,17 +22,18 @@ else {
         $Error.Clear()
         #Disable audio device
         Write-Host "Disabling adapter..."
-        Disable-PnpDevice "$HardwareCheck" -Confirm:$false
-        #Wait several seconds to allow operation
-        timeout.exe /nobreak /t 3
+        Disable-PnpDevice "$HardwareCheck" -Confirm:$false -ErrorAction SilentlyContinue
         if ($Error.Count -gt 0) {
             Write-Host ""
-            Write-Error "Issue disabling"
+            Write-Host -ForegroundColor Red "Issue disabling. Check that nothing besides the system is using sound and then rerun."
+            SndVol.exe
             Write-Host ""
             Pause
             Exit
         } 
         else {
+            #Wait several seconds to allow operation
+            timeout.exe /nobreak /t 3
             $Error.Clear()
             Write-Host ""
             Write-Host "Disabled successfully!"
@@ -42,15 +43,14 @@ else {
             Enable-PnpDevice "$HardwareCheck" -Confirm:$false
             Write-Host ""
             if ($Error.Count -gt 0) {
-                Write-Error "Issue enabling"
+                Write-Host -ForegroundColor Red "Issue enabling"
                 Write-Host ""
                 Pause
                 Exit
             } else {
                 Write-Host "Enabled successfully!"
-                Write-Host ""
             }
-        Pause
+        timeout /t 3
         Exit
         }
     }

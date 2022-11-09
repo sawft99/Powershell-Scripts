@@ -17,6 +17,7 @@
 | [PingTest.ps1](/PingTest.ps1)                                 | Ping one at a time and record results                                                   |
 | [PingTestParallel.ps1](/PingTestParallel.ps1)                 | Ping several points at once and collect info to files                                   |
 | [PingWithTime.ps1](/PingWithTime.ps1)                         | Ping with timestamp next to it                                                          |
+| [Prepend&Append.ps1](/Prepend&Append.ps1)                     | Prepend and append file names                                                           |
 | [RealtekSoundReset.ps1](/RealtekSoundReset.ps1)               | Disables and reenables Realtek audio device when headphones are not recognized          |
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |

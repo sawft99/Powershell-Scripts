@@ -40,9 +40,9 @@ $Folder = 'C:\PathToMegaPicFolder'
 #Set '$DryRun' to '$True' in order to simulate actions. Set to '$False' to perform the actual operations
 $DryRun = $True
 #Set 'Delete' variables to '$True' to remove that file type otherwise '$False' will skip them
-$DeleteOriginalChoice = $True
+$DeleteOriginalChoice = $False
 $DeleteDuplicateChoice = $True
-#For delete function at the end if you only want to only worry about files newer than X days. Otherwise a high threshold is default so as to capture all duplicates found
+#For delete function at the end if you only want to worry about files created within X days. Otherwise a high threshold is default so as to capture all duplicates found
 $NewerThanXDays = 9999999999
 #Premade arrays and other variables. You shouldn't need to mess with these
 $Originals = @()
@@ -54,15 +54,15 @@ $ProblemFiles = @()
 $Date = Get-Date
 
 #Check for $DryRun, and $Delete values to save you from yourself
-if (!((($DryRun -ne $True) -or ($DryRun -ne $False)) -or ($DryRun -eq $Null))) {
+if (($DryRun -ne $True) -and ($DryRun -ne $False)) {
     Write-Host -ForegroundColor Red '$DryRun' value needs to be either '$True' or '$False'
     Exit
 }
-if (!((($DeleteOriginalChoice -ne $True) -or ($DeleteOriginalChoice-ne $False)) -or ($DeleteOriginalChoice -eq $Null))) {
+if (($DeleteOriginalChoice -ne $True) -and ($DeleteOriginalChoice-ne $False)) {
     Write-Host -ForegroundColor Red '$DeleteOriginalChoice' value needs to be either '$True' or '$False'
     Exit
 }
-if (!((($DeleteDuplicateChoice -ne $True) -or ($DeleteDuplicateChoice-ne $False)) -or ($DeleteDuplicateChoice -eq $Null))) {
+if (($DeleteDuplicateChoice -ne $True) -and ($DeleteDuplicateChoice-ne $False)) {
     Write-Host -ForegroundColor Red '$DeleteDuplicateChoice' value needs to be either '$True' or '$False'
     Exit
 }
@@ -137,7 +137,7 @@ function DeleteFiles {
             $TimeDiff = $Date - $FileTime
             $TimeDiff = $TimeDiff.Days
             if ($TimeDiff -lt $NewerThanXDays) {
-                if ($DryRun = $False) {
+                if ($DryRun -eq $False) {
                     Remove-Item $File
                 }
                 $global:RemovedFiles += $File
@@ -245,7 +245,7 @@ If ($SkippedFiles.Count -gt 0) {
     Write-Host "Nothing skipped"
 }
 Write-Host ""
-if ($DryRun = $True) {
+if ($DryRun -eq $True) {
     Write-Host -ForegroundColor Cyan This was only a simulation. Change the value of '$DryRun' to '$False' to actually perform the operations.
     Write-Host ""
 }

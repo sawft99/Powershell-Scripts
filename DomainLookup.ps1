@@ -1,10 +1,11 @@
 #Lookup every possible TLD of a domain
 $DomainRoot = "example"
+[IPAddress]$DNSServer = "8.8.8.8"
 
 #Premade variables
 $TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
 $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\n"
-#Text document has a header so index starts at 1 and extra spaces at the end thus the '- 2'
+#Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
 $Resolved = @()
 $Unresolved = @()
@@ -16,7 +17,7 @@ Clear-Host
 foreach ($TLD in $AllTLD) {
     $FullDomain = ($DomainRoot + "." + $TLD)
     Write-Host "Looked up " -NoNewline
-    $Lookup = Resolve-DnsName $FullDomain -ErrorAction SilentlyContinue
+    $Lookup = Resolve-DnsName $FullDomain -Server $DNSServer -ErrorAction SilentlyContinue
     if ($Lookup.IPAddress.count -gt 0) {
         Write-Host -ForegroundColor Green "$FullDomain"
         $Resolved += $FullDomain

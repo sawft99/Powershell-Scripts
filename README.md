@@ -20,6 +20,6 @@
 | [PingWithTime.ps1](/PingWithTime.ps1)                         | Ping with timestamp next to it                                                          |
 | [Prepend&Append.ps1](/Prepend&Append.ps1)                     | Prepend and append file names                                                           |
 | [RealtekSoundReset.ps1](/RealtekSoundReset.ps1)               | Disables and reenables Realtek audio device when headphones are not recognized          |
-| [RemovePrefix&Suffix.ps1](/RemovePrefix&Suffix.ps1)           | Removes text in filename before and/or after specified string                           |
+| [RemovePrefix&Suffix.ps1](/RemovePrefix&Suffix.ps1)           | Removes specified text at beginning or end of file names                                |
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |

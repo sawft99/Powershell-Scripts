@@ -1,5 +1,5 @@
 #Lookup every possible TLD of a domain
-$DomainRoot = "example"
+$DomainRoot = "twitter"
 [IPAddress]$DNSServer = "8.8.8.8"
 
 #Premade variables
@@ -8,6 +8,7 @@ $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\
 #Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
 $Resolved = @()
+$ResolvedNOIP = @()
 $Unresolved = @()
 
 #DNSLookup
@@ -18,20 +19,30 @@ foreach ($TLD in $AllTLD) {
     $FullDomain = ($DomainRoot + "." + $TLD)
     Write-Host "Looked up " -NoNewline
     $Lookup = Resolve-DnsName $FullDomain -Server $DNSServer -ErrorAction SilentlyContinue
-    if ($Lookup.IPAddress.count -gt 0) {
+    #Resolve-DnsName $FullDomain -Server $DNSServer
+    if (($Lookup.IPAddress.count -gt 0) -or ($Lookup.IP4Address -gt 0) -or ($Lookup.IP6Address -gt 0)) {
         Write-Host -ForegroundColor Green "$FullDomain"
         $Resolved += $FullDomain
     } else {
-        Write-Host -ForegroundColor Red "$FullDomain"
-        $Unresolved += $FullDomain
+        if ($Lookup.count -gt 0) {
+            Write-Host -ForegroundColor Yellow "$FullDomain - No IP"
+            $ResolvedNOIP += $FullDomain
+        } else {
+            Write-Host -ForegroundColor Red "$FullDomain"
+            $Unresolved += $FullDomain
+        }  
     }
 }
 
 Clear-Host
-Write-Host Resolved domains:
+Write-Host ("Resolved Domains (" + ($Resolved.count) + "):")
 Write-Host ""
 $Resolved
-Write-Host""
-Write-Host Unresolved domains:
+Write-Host ""
+Write-Host ("Resolved Domains NOIP (" + ($ResolvedNOIP.count) + "):")
+Write-Host ""
+$ResolvedNOIP
+Write-Host ""
+Write-Host ("Unresolved Domains (" + ($Unresolved.count) + "):")
 Write-Host ""
 $Unresolved

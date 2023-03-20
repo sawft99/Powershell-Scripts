@@ -9,6 +9,7 @@ $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
 $Resolved = @()
 $ResolvedNOIP = @()
+$Collision = @()
 $Unresolved = @()
 
 #DNSLookup
@@ -18,11 +19,15 @@ Clear-Host
 foreach ($TLD in $AllTLD) {
     $FullDomain = ($DomainRoot + "." + $TLD)
     Write-Host "Looked up " -NoNewline
-    $Lookup = Resolve-DnsName $FullDomain -Server $DNSServer -ErrorAction SilentlyContinue
-    #Resolve-DnsName $FullDomain -Server $DNSServer
+    $Lookup = Resolve-DnsName $FullDomain -Server $DNSServer -DnsOnly -NoHostsFile -QuickTimeout -ErrorAction SilentlyContinue
     if (($Lookup.IPAddress.count -gt 0) -or ($Lookup.IP4Address -gt 0) -or ($Lookup.IP6Address -gt 0)) {
-        Write-Host -ForegroundColor Green "$FullDomain"
-        $Resolved += $FullDomain
+        if (($Lookup.IPAddress -eq "127.0.53.53") -or ($Lookup.IP4Address -eq "127.0.53.53")) {
+            Write-Host -ForegroundColor Yellow "$FullDomain - Collision"
+            $Collision += $FullDomain
+        } else {
+            Write-Host -ForegroundColor Green "$FullDomain"
+            $Resolved += $FullDomain
+        }
     } else {
         if ($Lookup.count -gt 0) {
             Write-Host -ForegroundColor Yellow "$FullDomain - No IP"
@@ -30,7 +35,7 @@ foreach ($TLD in $AllTLD) {
         } else {
             Write-Host -ForegroundColor Red "$FullDomain"
             $Unresolved += $FullDomain
-        }  
+        }
     }
 }
 
@@ -46,3 +51,7 @@ Write-Host ""
 Write-Host ("Unresolved Domains (" + ($Unresolved.count) + "):")
 Write-Host ""
 $Unresolved
+Write-Host ""
+Write-Host ("Collision Domains (" + ($Collision.count) + "):")
+Write-Host ""
+$Collision

@@ -1,9 +1,11 @@
 #Lookup every possible TLD of a domain
 $DomainRoot = "twitter"
-[IPAddress]$DNSServer = "8.8.8.8"
+$DNSServer = @('8.8.8.8')
 
 #Premade variables
 $TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
+$DNSTypes = @('A_AAAA','NS','CNAME','SOA','MX','TXT','DS','RRSIG','NSEC','DNSKEY')
+$WHOISURL = "https://rdap.markmonitor.com/rdap/domain/"
 $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\n"
 #Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
@@ -19,7 +21,9 @@ Clear-Host
 foreach ($TLD in $AllTLD) {
     $FullDomain = ($DomainRoot + "." + $TLD)
     Write-Host "Looked up " -NoNewline
-    $Lookup = Resolve-DnsName $FullDomain -Server $DNSServer -DnsOnly -NoHostsFile -QuickTimeout -ErrorAction SilentlyContinue
+    $Lookup = foreach ($Type in $DNSTypes) {
+        Resolve-DnsName $FullDomain -Server $DNSServer -DnsOnly -Type $Type -ErrorAction SilentlyContinue
+    }
     if (($Lookup.IPAddress.count -gt 0) -or ($Lookup.IP4Address -gt 0) -or ($Lookup.IP6Address -gt 0)) {
         if (($Lookup.IPAddress -eq "127.0.53.53") -or ($Lookup.IP4Address -eq "127.0.53.53")) {
             Write-Host -ForegroundColor Yellow "$FullDomain - Collision"
@@ -48,10 +52,10 @@ Write-Host ("Resolved Domains NOIP (" + ($ResolvedNOIP.count) + "):")
 Write-Host ""
 $ResolvedNOIP
 Write-Host ""
-Write-Host ("Unresolved Domains (" + ($Unresolved.count) + "):")
-Write-Host ""
-$Unresolved
-Write-Host ""
 Write-Host ("Collision Domains (" + ($Collision.count) + "):")
 Write-Host ""
 $Collision
+Write-Host ""
+Write-Host ("Unresolved Domains (" + ($Unresolved.count) + "):")
+Write-Host ""
+$Unresolved

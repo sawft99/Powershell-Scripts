@@ -2,14 +2,48 @@
 #Numbers and symbols are allowed but not rotated in any way
 $Alphabet = @("A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z")
 $Alphabet = $Alphabet.split(",")
-#You can change the number of rotations to something other than the traditional 13
-$RotRotation = 13
 
 Clear-Host
 
+#Functions
+
+Function AskOp {
+    do {
+        Clear-Host
+    Write-Host ""
+        $Op = Read-Host -Prompt "Select option 1 or 2:
+
+1. Encrypt
+2. Decrypt
+
+Option"
+if ($Op -ne 1 -and $Op -ne 2) {
+    Write-Host ""
+    Write-Host -ForegroundColor Red "Type '1' or '2'"
+    Write-Host
+    Pause
+}
+    } until ($Op -eq 1 -or $Op -eq 2)
+    $Op
+    return
+}
+
+Function RotPrompt {
+    #You can change the number of rotations to something other than the traditional 13
+    Write-Host ""
+    $RotRotation = Read-Host "Number of rotations"
+    $RotRotation
+    return
+}
+
 Function GetMessage {
     Write-Host ""
-    $Message = Read-Host -Prompt "Enter message that you want to encrypt or decrypt"
+    if ($Op -eq 1) {
+        $Message = Read-Host -Prompt "Enter message to encrypt"
+    }
+    if ($Op -eq 2) {
+        $Message = Read-Host -Prompt "Enter message to decrypt"
+    }
     $Message = $Message.ToUpper()
     $MessageSplit = $Message -split ""
     $MessageSplit = $MessageSplit | Select-Object -Skip 1
@@ -84,28 +118,10 @@ Function Decryption {
     return    
 }
 
-Function AskOp {
-    do {
-        Clear-Host
-    Write-Host ""
-        $Op = Read-Host -Prompt "Select option 1 or 2:
-
-1. Encrypt
-2. Decrypt
-
-Option"
-if ($Op -ne 1 -and $Op -ne 2) {
-    Write-Host ""
-    Write-Host -ForegroundColor Red "Type '1' or '2'"
-    Write-Host
-    Pause
-}
-    } until ($Op -eq 1 -or $Op -eq 2)
-    $Op
-    return
-}
+#Actions
 
 $Op = AskOp
+$RotRotation = RotPrompt
 
 if ($Op -eq 1) {
     $Message = GetMessage

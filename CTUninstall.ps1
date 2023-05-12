@@ -7,7 +7,7 @@ $Installs = foreach ($Reg in $Regs) {
 }
 foreach ($Install in $Installs) {
     $UninstallString = $Install.PSChildName
-    Start-Process  -Wait -NoNewWindow -FilePath C:\Windows\System32\msiexec.exe -ArgumentList "/x $UninstallString", "/quiet", "/norestart"
+    Start-Process -Wait -NoNewWindow -FilePath C:\Windows\System32\msiexec.exe -ArgumentList "/x $UninstallString", "/quiet", "/norestart"
 }
 
 #Last resort if reg search yields 0

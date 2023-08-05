@@ -2,6 +2,7 @@
 
 | Name                         | Function                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [CollatzConjecture.ps1](/CollatzConjecture.ps1)               | Demo of Colatz Conjecture Theory                                                        |
 | [COVID19PopUp.ps1](/COVID19PopUp.ps1)                         | Popup for a COVID acknowledgement asking employees about symptoms                       |
 | [Create&VerifyHash.ps1](/Create&VerifyHash.ps1)               | Create and verify a single file or folder hash                                          |
 | [CreateUserFolders.ps1](/CreateUserFolders.ps1)               | Creates a folder for each ADUser                                                        |
@@ -24,3 +25,4 @@
 | [ROT.ps1](/ROT.ps1)                                           | ROT encryption example with the ability to change the increment                         |
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |
+| [VirusTotal.ps1](/VirusTotal.ps1)                             | VT tool to upload and scan a file or scan a URL                                         |

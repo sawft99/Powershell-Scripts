@@ -21,9 +21,7 @@ do {
     if ($NetworkLineSelect -notin $NetworkFetch.line -xor $NetworkLineSelect -match "all") {
         Write-Host "Pick a valid option"
     }
-}    
-while (!($NetworkLineSelect -in $NetworkFetch.line -xor $NetworkLineSelect -match "all")) {
-    }
+} while (!($NetworkLineSelect -in $NetworkFetch.line -xor $NetworkLineSelect -match "all"))
 
 Write-Host "Gathering info please wait..."
 if ($NetworkLineSelect -match "all") {
@@ -134,8 +132,7 @@ if ($null -ne $NetTaskSelect) {
             do {
                 $APLineSelect = Read-Host -Prompt "Select a specifc AP to get info from"
             }
-            while ($APLineSelect -notin $SiteDevices.Line) {
-            }
+            while ($APLineSelect -notin $SiteDevices.Line)
             $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
             Write-Host "Info for" $APSelect.Name "AP"
             $APSelect | Format-Table -Property Name, LanIP, MAC, Serial, Model
@@ -151,8 +148,7 @@ if ($null -ne $NetTaskSelect) {
             do {
                 $APLineSelect = Read-Host -Prompt "Select an AP to reboot"
             }
-            while ($APLineSelect -notin $SiteDevices.Line) {
-            }
+            while ($APLineSelect -notin $SiteDevices.Line)
             $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
             $APSelectSerial = $APSelect.Serial
             Write-Host "Rebooting" $APSelect.Name "AP"
@@ -182,8 +178,7 @@ if ($null -ne $NetTaskSelect) {
             do {
                 $APLineSelect = Read-Host -Prompt "Select an AP to get clients from"
             }
-            while ($APLineSelect -notin $SiteDevices.Line) {
-            }
+            while ($APLineSelect -notin $SiteDevices.Line)
             $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
             $APSelectSerial = $APSelect.Serial
             $ClientInfo = Invoke-WebRequest -method get -Uri ("$DevicesURL/" + $APSelectSerial + "/clients") -WebSession $MerakiSession | ConvertFrom-Json
@@ -201,8 +196,7 @@ if ($null -ne $NetTaskSelect) {
             do {
                 $APLineSelect = Read-Host -Prompt "Select an AP to blink LED's on"
             }
-            while ($APLineSelect -notin $SiteDevices.Line) {
-            }
+            while ($APLineSelect -notin $SiteDevices.Line)
             $APSelect = $SiteDevices | Where-Object -Property line -eq $APLineSelect
             $APSelectSerial = $APSelect.Serial
             do {

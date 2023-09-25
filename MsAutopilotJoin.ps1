@@ -177,6 +177,7 @@ function APCheck {
         #    $APCheck = Test-Path "${env:ProgramFiles(x86)}\WindowsPowerShell\Scripts\Upload-WindowsAutopilotDeviceInfo.ps1"
         #}
         else {
+            $APCheck = $true
             Write-Host "Autopilot Script: Found, continuing...
             "
         }
@@ -225,7 +226,7 @@ function APUpload {
             $Tag
         )
         & $Script -TenantName $Tenant -Grouptag $Tag -ErrorAction 'Continue'
-    } -ArgumentList $Script, $Tenant, $Tag, 'Continue' -ErrorAction Continue
+    } -ArgumentList $Script, $Tenant, $Tag, 'Continue' -ErrorAction 'Continue'
     $APUpload
 }
 

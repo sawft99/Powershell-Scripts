@@ -1,6 +1,7 @@
 #Requires -RunAsAdministrator
 #Script that will auto download and install NuGet provider, PowershellGet module, and Autopilot script from PSGallery. It will then run the script to upload the config to your autopilot instance. You only need to provide valid credentials to join the device when prompted.
 Clear-Host
+$Error.Clear()
 #Elevation check
 $ElevationCheck = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if ($ElevationCheck -eq $false) {
@@ -175,7 +176,7 @@ function APCheck {
         #    Update-Script -Name 'Upload-WindowsAutopilotDeviceInfo' -Force -RequiredVersion $MinVer -Confirm:$false
         #    $APCheck = Test-Path "${env:ProgramFiles(x86)}\WindowsPowerShell\Scripts\Upload-WindowsAutopilotDeviceInfo.ps1"
         #}
-        elseif ($APCheck -eq $true) {
+        else {
             Write-Host "Autopilot Script: Found, continuing...
             "
         }
@@ -293,7 +294,7 @@ try {
     } else {
         $APCheck = APCheck
         if (($APCheck -eq $false) -or ($null -eq $APCheck)) {
-            Write-Host "Autopilot Script: Error installing script, reverting to original settings...
+            Write-Host -ForegroundColor Red "Autopilot Script: Error installing script, reverting to original settings...
             "
             PSGalleryReset
             ExecPolicyReset
@@ -302,7 +303,6 @@ try {
                 $APUpload = APUpload
                 Write-Host ""
             } catch {
-                Write-Host ""
                 Write-Host -ForegroundColor Red "Autopilot Script: Error running script, reverting to original settings...
                 "
                 PSGalleryReset

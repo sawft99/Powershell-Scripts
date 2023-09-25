@@ -219,15 +219,20 @@ function APUpload {
     } else {
         $Script = "${env:ProgramFiles(x86)}\WindowsPowerShell\Scripts\Upload-WindowsAutopilotDeviceInfo.ps1"
     }
-    $APUpload = Invoke-Command -ScriptBlock {
-        param (
-            $Script,
-            $Tenant,
-            $Tag
-        )
-        & $Script -TenantName $Tenant -Grouptag $Tag -ErrorAction 'Continue'
-    } -ArgumentList $Script, $Tenant, $Tag, 'Continue' -ErrorAction 'Continue'
-    $APUpload
+    try {    
+        $APUpload = Invoke-Command -ScriptBlock {
+            param (
+                $Script,
+                $Tenant,
+                $Tag
+            )
+            & $Script -TenantID $Tenant -Grouptag $Tag -ErrorAction 'Continue'
+        } -ArgumentList $Script, $Tenant, $Tag, 'Continue' -ErrorAction 'Continue'
+        $APUpload
+    } catch {
+        "Autopilot Script: Error running script, reverting to original settings...
+        "
+    }
 }
 
 #Set PSGallery trust back to original setting

@@ -16,6 +16,7 @@
 | [MegaDuplicates.ps1](/MegaDuplicates.ps1)                     | Removes duplicate and/or original files created by Mega sync phone app                  |
 | [Meraki.ps1](/Meraki.ps1)                                     | Do some basic tasks with Meraki API. Notable feature to reboot all access points        |
 | [MoveDisabledComputers.ps1](/MoveDisabledComputers.ps1)       | Find computers that have not been logged into for X days followed by disable and delete |
+| [MsAutopilotJoin.ps1](/MsAutopilotJoin.ps1)                   | Auto download and run components needed to upload computer info to MS Autopilot         | 
 | [PingTest.ps1](/PingTest.ps1)                                 | Ping one at a time and record results                                                   |
 | [PingTestParallel.ps1](/PingTestParallel.ps1)                 | Ping several points at once and collect info to files                                   |
 | [PingWithTime.ps1](/PingWithTime.ps1)                         | Ping with timestamp next to it                                                          |

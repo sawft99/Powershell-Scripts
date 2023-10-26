@@ -18,8 +18,10 @@ function Loop {
         $LastNum = $LastNum.ToString()
         if ($LastNum -in $Odds) {
             $x = (3 * $x) + 1
+            $x = $x -as [decimal]
         } elseif ($LastNum -in $Evens) {
             $x = $x/2
+            $x = $x -as [decimal]
         }
         Write-Host Step $i': '$x  
         $i++

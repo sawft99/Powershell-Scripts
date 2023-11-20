@@ -61,7 +61,8 @@ function CheckFileStatus {
             Start-Sleep -Seconds 10
             $i++
         } else {
-            Write-Host "idk"
+            Write-Error "Some kind of error"
+            exit 1
         }
     } until (($FileReportStatus -eq 'completed') -or $i -eq 30)
     if ($i -ge 30) {
@@ -187,20 +188,20 @@ switch ($OperationSelect) {
         $FileHash = GetFileHash
         $FileSize = FileSize
         $FileGUILink = FileGUILink
-        $FileVirusReports = FileVirusReports# | Sort-Object -Property Category | Format-Table -Property engine_name,category,result,method,engine_version,engine_update
+        $FileVirusReports = FileVirusReports
         #$DownloadLink = DownloadLink
+        #Report
+        #$FileReport
+        #$FileVirusReports | Sort-Object -Property Category | Format-Table -Property engine_name,category,result,method,engine_version,engine_update
+
     }
     2 {
         $ScanSite = ScanSite
         $SiteReport = SiteReport
         $URLGUILink = URLGUILink
-        $SiteVirusReports = SiteVirusReports# | Sort-Object -Property Category | Format-Table -Property engine_name,category,result,method
+        $SiteVirusReports = SiteVirusReports | Sort-Object -Property Category | Format-Table -Property engine_name,category,result,method
+        #Report
+        $SiteReport | Format-Table
+        $SiteVirusReports | Format-Table
     }
 }
-
-#Report
-
-Write-Host $FileReport
-Write-Host $FileVirusReports
-Write-Host $SiteReport
-Write-Host $SiteVirusReports

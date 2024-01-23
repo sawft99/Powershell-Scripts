@@ -7,6 +7,7 @@
 | [Create&VerifyHash.ps1](/Create&VerifyHash.ps1)               | Create and verify a single file or folder hash                                          |
 | [CreateUserFolders.ps1](/CreateUserFolders.ps1)               | Creates a folder for each ADUser                                                        |
 | [CTUninstall.ps1](/CTUninstall.ps1)                           | Uninstall Sonicwall Connect Tunnel and remove extras left behind                        |
+| [DNSDupCheck.ps1](/DNSDupCheck.ps1)                           | Checks for duplicate DNS records that could lead to conflicts                           |
 | [DomainLookup.ps1](/DomainLookup.ps1)                         | Lookup every TLD for a specified domain name                                            |
 | [FindDisabledComputers.ps1](/FindDisabledComputers.ps1)       | Find all disabled computers in domain                                                   |
 | [GetAllWMIInfo.ps1](/GetAllWMIInfo.ps1)                       | List all WMI classes (WIP?)                                                             |

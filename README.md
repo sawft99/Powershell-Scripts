@@ -2,6 +2,9 @@
 
 | Name                         | Function                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [ADBadPassCheck.ps1](/ADBadPassCheck.ps1)                     | Active Directory loop for checking on recent bad password attempts                      |
+| [ADUnlockLoop.ps1](/ADUnlockLoop.ps1)                         | Active Directory loop for unlocking a specific user account                             |
+| [ADUserLockoutCheck](/ADUserLockoutCheck.ps1)                 | Active Directory loop checking for locked out users on each Domain Controller           |
 | [CollatzConjecture.ps1](/CollatzConjecture.ps1)               | Demo of Colatz Conjecture Theory                                                        |
 | [COVID19PopUp.ps1](/COVID19PopUp.ps1)                         | Popup for a COVID acknowledgement asking employees about symptoms                       |
 | [Create&VerifyHash.ps1](/Create&VerifyHash.ps1)               | Create and verify a single file or folder hash                                          |

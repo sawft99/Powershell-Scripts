@@ -45,17 +45,21 @@ function BadPassCheck {
             $FinalInfo
         }
         if (($Loops -gt 1) -or ($Loops -eq 0)) {
-            #Uncomment if you want to have a header to break up each section
-            [string]$Time = (Get-Date).ToString('MM/dd/yyyy hh:mm:ss tt')
-            #Write-Host '-----------------------------------'
-            #Write-Host "Series Break: $Time"
-            #Write-Host '-----------------------------------'
-            if ($LogOption -eq $true) {
+            if ($null -ne $UsersQuery) {
                 #Uncomment if you want to have a header to break up each section
                 [string]$Time = (Get-Date).ToString('MM/dd/yyyy hh:mm:ss tt')
-                '-------------------------------------' | Out-File -Append $LogLocation
-                "Series Break: $Time"                   | Out-File -Append $LogLocation
-                '-------------------------------------' | Out-File -Append $LogLocation
+                #Write-Host '-----------------------------------'
+                #Write-Host "Series Break: $Time"
+                #Write-Host '-----------------------------------'
+            }
+            if ($LogOption -eq $true) {
+                if ($null -ne $UsersQuery) {
+                    #Uncomment if you want to have a header to break up each section
+                    [string]$Time = (Get-Date).ToString('MM/dd/yyyy hh:mm:ss tt')
+                    '-------------------------------------' | Out-File -Append $LogLocation
+                    "Series Break: $Time"                   | Out-File -Append $LogLocation
+                    '-------------------------------------' | Out-File -Append $LogLocation
+                }
             }
         }
     $UsersQuery
@@ -68,7 +72,7 @@ if ($Loops -ge 1) {
             Start-Sleep $SeriesDelay
         }
         $Check = BadPassCheck
-        if ($LogOption -eq $true) {
+        if (($LogOption -eq $true) -and ($null -ne $Check)) {
             $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt | Out-File $LogLocation -Append
         }
         $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt
@@ -83,7 +87,7 @@ if ($Loops -ge 1) {
         }
         $Check = BadPassCheck
         $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt
-        if ($LogOption -eq $true) {
+        if (($LogOption -eq $true) -and ($null -ne $Check)) {
             $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt | Out-File $LogLocation -Append
         }
         $Check = $null

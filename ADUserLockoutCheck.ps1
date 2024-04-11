@@ -1,4 +1,4 @@
-#Check for locked out users again list of domain controllers
+#Check for locked out users against list of domain controllers
 
 $DomainControllers = (Get-ADGroupMember 'Domain Controllers').Name
 [int]$Loops = 0 # 0 = Infinite
@@ -16,22 +16,19 @@ AD User Lockout Check
 Using: $($DomainControllers -join ',')
 "
 
-Remove-Variable Lockout
-$Error.Clear()
-
 function LockoutCheck {
-    if ($null -ne $Lockout) {
-        Remove-Variable Lockout
-    }
+    $Lockout = $null
     $Lockout = foreach ($Server in $DomainControllers) {
         #Write-Host "Checking server $Server..."
-        Search-ADAccount -UsersOnly -LockedOut -Server $Server
+        $LockSearch = Search-ADAccount -UsersOnly -LockedOut -Server $Server
+        $LockSearch
     }
-    if ($null -ne $Lockout) {
-        $Time = Get-Date -Format 'MM/dd/yyyy hh:mm tt'
-        $Lockout | Add-Member -MemberType NoteProperty -Name 'LockoutTime' -Value $Time
+    $Lockout = $Lockout | Select-Object -Unique
+    $Lockout = foreach ($User in $Lockout) {
+        $Query = Get-ADUser -Identity $User -Properties Name,SAMAccountName,Enabled,LockedOut,Enabled,LastBadPasswordAttempt
+        $Query
     }
-    $Lockout | Format-Table CN,LockoutTime,Enabled,LastBadPasswordAttempt,LockoutTime
+    $Lockout | Format-Table Name,SAMAccountName,Enabled,LastBadPasswordAttempt,LockedOut #,LockoutTime
 }
 
 if ($Loops -eq 0) {

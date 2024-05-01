@@ -1,12 +1,16 @@
 #Loop on unlocking a specific user account
 
-$User = 'user@example.com' # UPN formating
-[int]$Delay = 5 #Delay in seconds, time between each check of account status
+$User = 'user@example.com' # UPN formatting
+[int]$SeriesDelay = 5 #Delay in seconds, time between each series check of account status
+[int]$ServerDelay = 0 #Delay in seconds, time between each servers check of account status
 [int]$Loops = 0 # 0 = infinite
 $LogOption = $true
-$LogLocaiton = 'C:\Log.txt'
+$LogFolder = 'C:\Logs'
+#Will create a log called 'Unlock-UserNameHere.txt'
+$LogLocation = $LogFolder + '\Unlock-' + ($User -split '@')[0] + '.txt'
 
 $DomainControllers = (Get-ADGroupMember 'Domain Controllers').Name
+
 #----------
 
 $User = Get-ADUser -Filter {UserPrincipalName -like $User}
@@ -18,17 +22,16 @@ if ($null -eq $User) {
 Clear-Host
 
 Write-Host "
------------------
+=================
 Unlock User Loop
------------------
+=================
 
 User: $($User.SamAccountName)
-
-Checking account...
 "
 
 function CheckLockStatus {
     $Status = foreach ($Server in $DomainControllers) {
+        Start-Sleep $ServerDelay
         #Write-Host "Checking server $Server"
         [string]$Time = Get-Date -Format 'MM/dd/yyyy hh:mm tt'
         $Check = (Get-ADUser $User -Properties LockedOut -Server $Server).LockedOut
@@ -87,7 +90,7 @@ if ($Loops -eq 0) {
             #Write-Host "Account was locked at $($Time)"
             UnlockAccount
         }
-        Start-Sleep $Delay
+        Start-Sleep $SeriesDelay
     } until ($i -eq 1)
 } else {
     $i = 0
@@ -102,6 +105,6 @@ if ($Loops -eq 0) {
             UnlockAccount
         }
         $i = $i + 1
-        Start-Sleep $Delay
+        Start-Sleep $SeriesDelay
     } until ($i -eq $Loops)
 }

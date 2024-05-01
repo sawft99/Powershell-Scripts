@@ -1,5 +1,5 @@
 #A demo of the Collatz Conjecture Theory
-#If x is odd apply:  3x + 1
+#If x is odd apply: 3x + 1
 #If x is even apply: x/2
 #Repeat and you will always eventually end up with '1'
 
@@ -23,7 +23,7 @@ function Loop {
             $x = $x/2
             $x = $x -as [decimal]
         }
-        Write-Host Step $i': '$x  
+        Write-Host Step $i': '$x
         $i++
     } until ($x -eq 1)
 }

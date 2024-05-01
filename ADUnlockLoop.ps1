@@ -6,18 +6,11 @@ $User = 'user@example.com' # UPN formatting
 [int]$Loops = 0 # 0 = infinite
 $LogOption = $true
 $LogFolder = 'C:\Logs'
-#Will create a log called 'Unlock-UserNameHere.txt'
 $LogLocation = $LogFolder + '\Unlock-' + ($User -split '@')[0] + '.txt'
 
 $DomainControllers = (Get-ADGroupMember 'Domain Controllers').Name
 
 #----------
-
-$User = Get-ADUser -Filter {UserPrincipalName -like $User}
-if ($null -eq $User) {
-    Write-Host -ForegroundColor Red 'User does not exist'
-    exit 1
-}
 
 Clear-Host
 
@@ -25,9 +18,18 @@ Write-Host "
 =================
 Unlock User Loop
 =================
-
-User: $($User.SamAccountName)
 "
+
+$User = Get-ADUser -Filter {UserPrincipalName -like $User}
+if ($null -eq $User) {
+    Write-Host -ForegroundColor Red 'User does not exist
+    '
+    exit 1
+} else {
+    Write-Host "User: $($User.SamAccountName)
+    "
+}
+
 
 function CheckLockStatus {
     $Status = foreach ($Server in $DomainControllers) {

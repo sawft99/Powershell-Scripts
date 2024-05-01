@@ -11,14 +11,14 @@ $TempSettingsFile = "$ParentDirectory\TempSettings.xps"
 $DecodedSettingsFile = "$ParentDirectory\TempSettings.txt"
 $FinalFile = "$ParentDirectory\DecryptedSettings.txt"
 
-#Trim charecters at end so it can be properly decoded
+#Trim characters at end so it can be properly decoded
 $OriginalSettingsTrim1 = $OriginalSettings.TrimEnd("&&")
 $OriginalSettingsTrim1 | Out-File -FilePath $TempSettingsFile
 
 #Decode file
 certutil.exe -decode $TempSettingsFile $DecodedSettingsFile
 
-#Change charecters in file
+#Change characters in file
 $DecodedContent = Get-Content $DecodedSettingsFile
 $FinalContent = $DecodedContent.Replace("&", "`n")
 

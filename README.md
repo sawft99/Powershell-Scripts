@@ -2,7 +2,7 @@
 
 | Name                         | Function                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| [ADBadPassCheck.ps1](/ADBadPassCheck.ps1)                     | Active Directory loop for checking on recent bad password attempts                      |
+| [ADBadPassCheck.ps1](/ADBadPassCheck.ps1)                     | Active Directory loop for checking on recent bad password attempts and current lockouts |
 | [ADUnlockLoop.ps1](/ADUnlockLoop.ps1)                         | Active Directory loop for unlocking a specific user account                             |
 | [ADUserLockoutCheck](/ADUserLockoutCheck.ps1)                 | Active Directory loop checking for locked out users on each Domain Controller           |
 | [CollatzConjecture.ps1](/CollatzConjecture.ps1)               | Demo of Colatz Conjecture Theory                                                        |

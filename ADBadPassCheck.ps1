@@ -3,10 +3,10 @@
 
 $ADGroupNameFilter = 'Domain Users'
 $ADGroupScopeFilter = 'CN=Domain Users,CN=Users,DC=domain,DC=com'
-$ADOUScopeFilter = 'OU=JDHCOUsers,DC=DOMAIN,DC=COM'
+$ADOUScopeFilter = 'OU=Users,DC=DOMAIN,DC=COM'
 $DomainControllers = (Get-ADGroupMember 'Domain Controllers').Name # @('DC01','DC02','DC03')
 $LogOption = $true # or '$false'
-[System.IO.FileInfo]$LogLocation = 'C:\Log.txt'
+[System.IO.FileInfo]$BaseLogLocation = 'C:\Log.txt'
 
 [int]$Loops = 0 # 0 = Infinite
 [int]$UserDelay = 0 # 0 = No delay, measured in seconds, delay between each user query
@@ -72,7 +72,7 @@ function BadPassCheck {
         if ($LogOption -eq $true) {
             if ($null -ne $Results) {
                 [string]$Day = (Get-Date).ToString('MM-dd-yyyy')
-                $LogLocation = ($LogLocation.FullName -split $LogLocation.Extension)[0] + '-' + $Day + $LogLocation.Extension
+                $LogLocation = ($BaseLogLocation.FullName -split $BaseLogLocation.Extension)[0] + '-' + $Day + $BaseLogLocation.Extension
                 [string]$Time = (Get-Date).ToString('MM/dd/yyyy hh:mm:ss tt')
                 '-------------------------------------' | Out-File -Append $LogLocation
                 "Series Break: $Time"                   | Out-File -Append $LogLocation
@@ -92,7 +92,7 @@ if ($Loops -ge 1) {
         $Check = BadPassCheck
         if (($LogOption -eq $true) -and ($null -ne $Check)) {
             [string]$Day = (Get-Date).ToString('MM-dd-yyyy')
-            $LogLocation = ($LogLocation.FullName -split $LogLocation.Extension)[0] + '-' + $Day + $LogLocation.Extension
+            $LogLocation = ($BaseLogLocation.FullName -split $BaseLogLocation.Extension)[0] + '-' + $Day + $BaseLogLocation.Extension
             $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt,BadPwdCount,LockedOut,Server -AutoSize | Out-File $LogLocation -Append
         }
         Write-Output $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt,BadPwdCount,LockedOut,Server -AutoSize
@@ -108,7 +108,7 @@ if ($Loops -ge 1) {
         $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt,BadPwdCount,LockedOut,Server -AutoSize
         if (($LogOption -eq $true) -and ($null -ne $Check)) {
             [string]$Day = (Get-Date).ToString('MM-dd-yyyy')
-            $LogLocation = ($LogLocation.FullName -split $LogLocation.Extension)[0] + '-' + $Day + $LogLocation.Extension
+            $LogLocation = ($BaseLogLocation.FullName -split $BaseLogLocation.Extension)[0] + '-' + $Day + $BaseLogLocation.Extension
             Write-Output $Check | Format-Table Name,SamAccountName,LastBadPasswordAttempt,BadPwdCount,LockedOut,Server -AutoSize | Out-File $LogLocation -Append
         }
         $i = $i + 1

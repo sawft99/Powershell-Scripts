@@ -10,7 +10,7 @@ $File = ($env:USERPROFILE + "\appdata\local\CovidScript\COVIDSurvey.txt")
 # Check for existence of Kaseya appdata folder. Make folder if it does not exist.
 If ($FolderExist -eq $false) {
     mkdir ($env:USERPROFILE + "\appdata\local\CovidScript")
-    }
+}
 
 # If $file exists $runonce is equal to whatever content is inside the file, else $runonce equals 0.
 If (Test-Path $File) {
@@ -38,7 +38,7 @@ Within the past 2 weeks have you had any of the following:
 4.	Shortness of Breath (not severe)
 5.	New loss of taste and/or smell
 6.	Been exposed to anyone confirmed with COVID-19
-7.	Traveled outside of the State of Florida and/or any known high risk areas within Florida.
+7.	Traveled outside of the State of X and/or any known high risk areas within X.
 
 If you answered yes to any of the above question you must contact your direct manager or leader before you begin your work day.
 

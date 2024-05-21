@@ -55,24 +55,24 @@ foreach ($Domain in $DomainRoot) {
             if (($Lookup.IPAddress -eq "127.0.53.53") -or ($Lookup.IP4Address -eq "127.0.53.53")) {
                 Write-Host -ForegroundColor Yellow "$($FullDomain.ToUpper()) - Collision/Unofficial"
                 $Collision = $Collision + $FullDomain
+                $FullDomain | Out-File -FilePath "$DomainFolder\!Collision.txt" -Force -Append
             } else {
                 Write-Host -ForegroundColor Green "$($FullDomain.ToUpper())"
                 $Resolved = $Resolved + $FullDomain
+                $FullDomain | Out-File -FilePath "$DomainFolder\!Resolved.txt" -Force -Append
             }
         } else {
             if ($Lookup.count -gt 0) {
                 Write-Host -ForegroundColor Yellow "$($FullDomain.ToUpper()) - No IP"
                 $ResolvedNOIP = $ResolvedNOIP + $FullDomain
+                $FullDomain | Out-File -FilePath "$DomainFolder\!ResolvedNOIP.txt" -Force -Append
             } else {
                 Write-Host -ForegroundColor Red "$($FullDomain.ToUpper())"
                 $Unresolved = $Unresolved + $FullDomain
+                $FullDomain | Out-File -FilePath "$DomainFolder\!Unresolved.txt" -Force -Append
             }
         }
     }
-    $Resolved     | Out-File -FilePath "$DomainFolder\!Resolved.txt" -Force -Append
-    $ResolvedNOIP | Out-File -FilePath "$DomainFolder\!ResolvedNOIP.txt" -Force -Append
-    $Collision    | Out-File -FilePath "$DomainFolder\!Collision.txt" -Force -Append
-    $Unresolved   | Out-File -FilePath "$DomainFolder\!Unresolved.txt" -Force -Append
 }
 
 #Report

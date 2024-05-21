@@ -8,7 +8,7 @@ $DNSTypes = @('A_AAAA','NS','CNAME','SOA','MX','TXT','DS','RRSIG','NSEC','DNSKEY
 $TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
 $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\n"
 #Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
-$AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
+$AllTLD = ($AllTLD[1..($AllTLD.Count - 2)]).ToUpper()
 
 #---------------
 
@@ -17,8 +17,7 @@ Clear-Host
 Write-Host '
 =================
 Domain TLD Lookup
-=================
-'
+================='
 
 #Test for parent path
 if ($OutputFolder.Exists -eq $false) {
@@ -39,6 +38,9 @@ foreach ($Domain in $DomainRoot) {
     $ResolvedNOIP = @()
     $Collision = @()
     $Unresolved = @()
+    Write-Host ''
+    Write-Host 'Running lookups for: ' -NoNewline && Write-Host -ForegroundColor Cyan $Domain.ToUpper()
+    Write-Host ''
     foreach ($TLD in $AllTLD) {
         $FullDomain = ($Domain + "." + $TLD)
         $Lookup = foreach ($Type in $DNSTypes) {
@@ -51,18 +53,18 @@ foreach ($Domain in $DomainRoot) {
         Write-Host "Looked up " -NoNewline
         if (($Lookup.IPAddress.count -gt 0) -or ($Lookup.IP4Address -gt 0) -or ($Lookup.IP6Address -gt 0)) {
             if (($Lookup.IPAddress -eq "127.0.53.53") -or ($Lookup.IP4Address -eq "127.0.53.53")) {
-                Write-Host -ForegroundColor Yellow "$FullDomain - Collision/Unofficial"
+                Write-Host -ForegroundColor Yellow "$($FullDomain.ToUpper()) - Collision/Unofficial"
                 $Collision = $Collision + $FullDomain
             } else {
-                Write-Host -ForegroundColor Green "$FullDomain"
+                Write-Host -ForegroundColor Green "$($FullDomain.ToUpper())"
                 $Resolved = $Resolved + $FullDomain
             }
         } else {
             if ($Lookup.count -gt 0) {
-                Write-Host -ForegroundColor Yellow "$FullDomain - No IP"
+                Write-Host -ForegroundColor Yellow "$($FullDomain.ToUpper()) - No IP"
                 $ResolvedNOIP = $ResolvedNOIP + $FullDomain
             } else {
-                Write-Host -ForegroundColor Red "$FullDomain"
+                Write-Host -ForegroundColor Red "$($FullDomain.ToUpper())"
                 $Unresolved = $Unresolved + $FullDomain
             }
         }

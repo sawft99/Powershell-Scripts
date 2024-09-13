@@ -20,6 +20,7 @@ $TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
 $WHOISSource = 'https://www.iana.org/whois?q='
 $WhoisInfoSource = 'https://who-dat.as93.net/'
 $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\n"
+#$DNSTypes = @('A_AAAA','NS','CNAME','SOA','MX','TXT','DS','RRSIG','NSEC','DNSKEY')
 #Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
 
@@ -67,9 +68,14 @@ function CheckWhoisServerInfo {
     $WhoisServerInfo = foreach ($WhoServer in $WhoisServers) {
         $DomainServerInfo = foreach ($DomainServer in $WhoServer.DNS) {
             $RootDomain = ($DomainServer -split '\.' | Select-Object -Last 2) -join '.'
+            #Note: Dedup DNS whois servers here
             Write-Host "Checking $($WhoServer.TLD) for server at $($RootDomain)"
             $Query = ((Invoke-WebRequest -UseBasicParsing ($WhoisInfoSource + $RootDomain)).Content | ConvertFrom-Json).Domain
-            [string]$Expires = [datetime]($Query.expiration_date) | Get-Date -Format $DateFormat
+            if ($null -ne $Query.expiration_date) {
+                [string]$Expires = [datetime]($Query.expiration_date) | Get-Date -Format $DateFormat
+            } else {
+                [string]$Expires = 'NA'
+            }
             $WholeObject = [PSCustomObject]@{
                 TLD = $WhoServer.TLD
                 Created = $WhoServer.Created

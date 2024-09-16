@@ -87,6 +87,7 @@ function CheckWhoisServerInfo {
         }
         $DomainServerInfo
     }
+    $WhoisServerInfo
 }
 
 #Run

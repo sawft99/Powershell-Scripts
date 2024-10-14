@@ -1,4 +1,9 @@
 #Lookup every WhoIs server and some info
+#Premade variables
+$TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
+$WHOISSource = 'https://www.iana.org/whois?q='
+$WhoisInfoSource = 'https://who-dat.as93.net/'
+#User variables
 [System.IO.DirectoryInfo]$OutputFolder = 'C:\Output'
 $DateFormat = 'yyyy-MM-dd'
 [int32]$Delay = 0
@@ -8,10 +13,15 @@ $DateFormat = 'yyyy-MM-dd'
 
 Clear-Host
 
-#Premade variables
-$TLDSource = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
-$WHOISSource = 'https://www.iana.org/whois?q='
-$WhoisInfoSource = 'https://who-dat.as93.net/'
+#Test for parent path
+$FolderTest = Test-Path $OutputFolder
+if ($FolderTest -eq $false) {
+    Write-Host -ForegroundColor Red "
+Folder does not exist
+"
+    exit 1
+}
+
 $AllTLD = (Invoke-WebRequest -UseBasicParsing -Uri $TLDSource).content -split "\n"
 #Text document has a header so index starts at 1 and there are extra spaces at the end thus the '- 2'
 $AllTLD = $AllTLD[1..($AllTLD.Count - 2)]
@@ -29,6 +39,9 @@ function GetWhoisServers {
             Write-Host "Looking up $TLD..."
             $Query = (Invoke-WebRequest -UseBasicParsing -TimeoutSec $Timeout -Uri ($WHOISSource + $TLD)).Content -split '\n'
             Start-Sleep $Delay
+            if ($null -eq $Query) {
+                #Write-Host -ForegroundColor Red ' | Failed/Timed Out'
+            }
             $Status = ($Query | Where-Object {$_.StartsWith('status:      ')}).TrimStart('status:      ')
             [string]$Created = (($Query | Where-Object {$_.StartsWith('created:      ')}).TrimStart('created:      ') | Get-Date -Format $DateFormat)
             [string]$Changed = (($Query | Where-Object {$_.StartsWith('changed:      ')}).TrimStart('changed:      ') | Get-Date -Format $DateFormat)
@@ -58,6 +71,9 @@ function GetWhoisServers {
                 Ipv6 =    @($NServersIpv6)
             }
         } catch {
+            if ($null -eq $Query) {
+                #Write-Host -ForegroundColor Red ' | Failed/Timed Out'
+            }
             $WholeObject = [PSCustomObject]@{
                 TLD =     $TLD
                 Status =  'Error'
@@ -83,6 +99,7 @@ function CheckWhoisServerInfo {
             $DNSServerSplit
         }
         $DomainServers = ($DomainServers | Group-Object).Name
+        #$DomainServerInfo = foreach ($DomainServer in $WhoServer.DNS) {
         $DomainServerInfo = foreach ($DomainServer in $DomainServers) {
             $Query = $null
             $Expires = $null
@@ -92,6 +109,9 @@ function CheckWhoisServerInfo {
             Write-Host "Checking $($WhoServer.TLD) for server at $($RootDomain)"
             try {
                 $Query = ((Invoke-WebRequest -UseBasicParsing -TimeoutSec $Timeout -Uri ($WhoisInfoSource + $RootDomain)).Content | ConvertFrom-Json).Domain
+                if ($null -eq $Query) {
+                    #Write-Host -ForegroundColor Red '| Failed'
+                }
                 try {
                     if ($null -ne $Query.expiration_date) {
                         [string]$Expires = [datetime]($Query.expiration_date) | Get-Date -Format $DateFormat
@@ -134,11 +154,18 @@ function CheckWhoisServerInfo {
 #Run
 #----------------
 
+Clear-Host
+
+$WhoisServers = GetWhoisServers
+$WhoisServerInfo = CheckWhoisServerInfo
+
 Write-Host '
 =============
 Whois Servers
 =============
 '
 
-$WhoisServers = GetWhoisServers
-$WhoisServerInfo = CheckWhoisServerInfo
+$ExpiredWhoisServers = ($WhoisServerInfo | Where-Object -Property Expiration -le (Get-Date -Format $DateFormat)).WHOISSERVER
+$ExpiredWhoisServersDetailed = $WhoisServerInfo | Where-Object -Property WhoIsServer -in $ExpiredWhoisServers
+
+$ExpiredWhoisServersDetailed | Format-Table

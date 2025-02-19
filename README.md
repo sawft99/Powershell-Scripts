@@ -18,6 +18,7 @@
 | [GetChromeGuid.ps1](/GetChromeGuid.ps1)                       | Get chrome uninstall GUID and create a registry entry for it                            |
 | [GetPartialWindowsKey.ps1](/GetPartialWindowsKey.ps1)         | Get part of Windows key and record to a file                                            |
 | [GetWindowsUpdates.ps1](/GetWindowsUpdates.ps1)               | Get and install all Windows updates                                                     |
+| [LongPathFinder.ps1](/LongPathFinder.ps1)                     | Find paths that exceed Windows max ability or other set limit                           | 
 | [MegaDuplicates.ps1](/MegaDuplicates.ps1)                     | Removes duplicate and/or original files created by Mega sync phone app                  |
 | [Meraki.ps1](/Meraki.ps1)                                     | Do some basic tasks with Meraki API. Notable feature to reboot all access points        |
 | [MoveDisabledComputers.ps1](/MoveDisabledComputers.ps1)       | Find computers that have not been logged into for X days followed by disable and delete |

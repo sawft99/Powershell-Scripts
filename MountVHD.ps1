@@ -1,4 +1,4 @@
-#Mounts VHD. Create a scheduled task with admin permisisons to run at a given time such as logon.
+#Mounts VHD. Create a scheduled task with admin permissions to run at a given time such as logon.
 
 [System.IO.DirectoryInfo]$VHDSourceFolder = 'C:\Directory'
 $VHDS = Get-ChildItem $VHDSourceFolder | Where-Object {($_.Extension.EndsWith('.vhd')) -or ($_.Extension.EndsWith('.vhdx'))} | Sort-Object -Property FullName

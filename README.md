@@ -3,7 +3,7 @@
 | Name                         | Function                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | [ADBadPassCheck.ps1](/ADBadPassCheck.ps1)                     | Active Directory loop for checking on recent bad password attempts and current lockouts |
-| [ADForceLockout.ps1](/ADForceLockout.ps1)                      | Active Directory loop to force a lockout of an account                                  |
+| [ADForceLockout.ps1](/ADForceLockout.ps1)                     | Active Directory loop to force a lockout of an account                                  |
 | [ADUnlockLoop.ps1](/ADUnlockLoop.ps1)                         | Active Directory loop for unlocking a specific user account                             |
 | [ADUserLockoutCheck](/ADUserLockoutCheck.ps1)                 | Active Directory loop checking for locked out users on each Domain Controller           |
 | [CollatzConjecture.ps1](/CollatzConjecture.ps1)               | Demo of Colatz Conjecture Theory                                                        |
@@ -33,3 +33,4 @@
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |
 | [VirusTotal.ps1](/VirusTotal.ps1)                             | VT tool to upload and scan a file or scan a URL                                         |
+| [WG-VPNCheck.ps1](/WG-VPNCheck.ps1)                           | Check if WireGuard VPN is running. Can stop and restart if current DNS doesn't match IP |

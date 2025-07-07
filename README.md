@@ -14,6 +14,7 @@
 | [DNSDupCheck.ps1](/DNSDupCheck.ps1)                           | Checks for duplicate DNS records that could lead to conflicts                           |
 | [DomainLookup.ps1](/DomainLookup.ps1)                         | Lookup every TLD for a specified domain name                                            |
 | [FindDisabledComputers.ps1](/FindDisabledComputers.ps1)       | Find all disabled computers in domain                                                   |
+| [FindOldADLogin.ps1](/FindOldADLogin.ps1)                     | Find accounts that haven't logged into AD in X amount of days                           |
 | [GetAllWMIInfo.ps1](/GetAllWMIInfo.ps1)                       | List all WMI classes (WIP?)                                                             |
 | [GetChromeGuid.ps1](/GetChromeGuid.ps1)                       | Get chrome uninstall GUID and create a registry entry for it                            |
 | [GetPartialWindowsKey.ps1](/GetPartialWindowsKey.ps1)         | Get part of Windows key and record to a file                                            |

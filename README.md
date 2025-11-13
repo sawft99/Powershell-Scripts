@@ -31,6 +31,7 @@
 | [RealtekSoundReset.ps1](/RealtekSoundReset.ps1)               | Disables and reenables Realtek audio device when headphones are not recognized          |
 | [RemovePrefix&Suffix.ps1](/RemovePrefix&Suffix.ps1)           | Removes specified text at beginning or end of file names                                |
 | [ROT.ps1](/ROT.ps1)                                           | ROT encryption example with the ability to change the increment                         |
+| [SecurityFeatureCheck.ps1](/SecurityFeatureCheck.ps1)         | Check statuses for Windows security features                                            |
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |
 | [VirusTotal.ps1](/VirusTotal.ps1)                             | VT tool to upload and scan a file or scan a URL                                         |

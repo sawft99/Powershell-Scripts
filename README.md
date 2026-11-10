@@ -34,5 +34,6 @@
 | [SecurityFeatureCheck.ps1](/SecurityFeatureCheck.ps1)         | Check statuses for Windows security features                                            |
 | [SonicwallConfigDecryptor.ps1](/SonicwallConfigDecryptor.ps1) | Decrypt Sonicwall config files                                                          |
 | [Synaccess.ps1](/Synaccess.ps1)                               | Basic tasks in Synaccess PDU. Reboot and toggle ports                                   |
+| [UserTerm.ps1](/UserTerm.ps1)                                 | Term Entra based user. Reset password, disable, convert mail to shared, etc.            |
 | [VirusTotal.ps1](/VirusTotal.ps1)                             | VT tool to upload and scan a file or scan a URL                                         |
 | [WG-VPNCheck.ps1](/WG-VPNCheck.ps1)                           | Check if WireGuard VPN is running. Can stop and restart if current DNS doesn't match IP |

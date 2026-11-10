@@ -1,6 +1,5 @@
-﻿#Create and/or verify a hash with Windows certutil
+#Create and/or verify a hash with Windows certutil
 #Made because I didn't know 'Get-FileHash' existed
-#For verifyhashfolder function a text file with one hash per line will work
 
 #Types of hashes
 $HashTypes = "MD2","MD4","MD5","SHA1","SHA256","SHA384","SHA512"
@@ -110,6 +109,7 @@ function CreateHashFile {
     return $HashCalcTable
 }
 
+#Option to compare single file to list of hashes?
 function VerifyHashFile {
     $HashOp = AskHash
     Write-Host ""
@@ -129,7 +129,6 @@ function VerifyHashFile {
     Write-Host ""
     $HashCalcTable = CreateTable
     $MatchTest     = $HashCalcTable.($HashOp + " Value").IndexOf("$CompareHash")
-    #Write-Host ""
     if ($MatchTest -eq -1) {
         Add-Member -InputObject $HashCalcTable -MemberType NoteProperty -Name "Compared Hash" -Value $CompareHash
         Add-Member -InputObject $HashCalcTable -MemberType NoteProperty -Name "Match" -Value "No"
@@ -172,7 +171,6 @@ function VerifyHashFolder {
             Write-Host ""
         }
     } until (($Null -ne $HashFileImport -and $HashFileImport.Length -gt 0) -and (Test-Path $HashFileImport))
-    #Pause
     $HashFileImport = Get-Content $HashFileImport
     $HashCalcTable = @()
     Clear-Host
@@ -237,11 +235,17 @@ switch ($AskOpPick) {
     2 {
         if ($FilePath.Count -eq 1) {
             $VerifyHashReturn = VerifyHashFile
-            $VerifyHashReturn
+            $VerifyHashReturn | Format-List
         }
         else {
             $VerifyHashReturn = VerifyHashFolder
-            $VerifyHashReturn
+            $VerifyHashReturn | Format-List
+
+            Write-Host -ForegroundColor Yellow ('Tip:
+
+$VerifyHashReturn | Export-CSV
+$VerifyHashReturn | Where-Object -Property Match -EQ "Yes"
+')
         }
     }
 }
